@@ -56,7 +56,7 @@ function renderCart() {
     const decrease = document.createElement("button");
     decrease.type = "button";
     decrease.dataset.action = "decrease";
-    decrease.dataset.product = item.name;
+    decrease.dataset.product = item.id;
     decrease.setAttribute("aria-label", `Remove one ${item.name}`);
     decrease.textContent = "−";
     const count = document.createElement("span");
@@ -64,7 +64,8 @@ function renderCart() {
     const increase = document.createElement("button");
     increase.type = "button";
     increase.dataset.action = "increase";
-    increase.dataset.product = item.name;
+    increase.dataset.product = item.id;
+    increase.disabled = item.quantity >= item.maxStock;
     increase.setAttribute("aria-label", `Add one ${item.name}`);
     increase.textContent = "+";
     controls.append(decrease, count, increase);
@@ -73,7 +74,7 @@ function renderCart() {
     remove.type = "button";
     remove.className = "remove-item";
     remove.dataset.action = "remove";
-    remove.dataset.product = item.name;
+    remove.dataset.product = item.id;
     remove.textContent = "Remove";
     row.append(details, controls, remove);
     cartItems.append(row);
@@ -94,15 +95,23 @@ function closeCart() {
   bagButton.focus();
 }
 
-document.querySelectorAll(".quick-add").forEach((button) => {
-  button.addEventListener("click", () => {
-    const name = button.dataset.product;
-    const price = Number(button.dataset.price);
-    const item = cart.get(name);
-    cart.set(name, { name, price, quantity: (item?.quantity ?? 0) + 1 });
-    renderCart();
-    showToast(`${name} added to your bag`);
-  });
+document.querySelector(".product-grid").addEventListener("click", (event) => {
+  const button = event.target.closest(".quick-add");
+  if (!button) return;
+
+  const id = button.dataset.productId || button.dataset.product;
+  const name = button.dataset.product;
+  const price = Number(button.dataset.price);
+  const maxStock = button.dataset.stock ? Number(button.dataset.stock) : Number.POSITIVE_INFINITY;
+  const item = cart.get(id);
+  if (item && item.quantity >= maxStock) {
+    showToast(`Only ${maxStock} ${maxStock === 1 ? "item is" : "items are"} available`);
+    return;
+  }
+
+  cart.set(id, { id, name, price, maxStock, quantity: (item?.quantity ?? 0) + 1 });
+  renderCart();
+  showToast(`${name} added to your bag`);
 });
 
 bagButton.addEventListener("click", openCart);
@@ -115,10 +124,14 @@ cartItems.addEventListener("click", (event) => {
   const item = cart.get(button.dataset.product);
   if (!item) return;
   if (button.dataset.action === "remove" || (button.dataset.action === "decrease" && item.quantity === 1)) {
-    cart.delete(item.name);
+    cart.delete(item.id);
   } else if (button.dataset.action === "decrease") {
     item.quantity -= 1;
   } else if (button.dataset.action === "increase") {
+    if (item.quantity >= item.maxStock) {
+      showToast(`Only ${item.maxStock} ${item.maxStock === 1 ? "item is" : "items are"} available`);
+      return;
+    }
     item.quantity += 1;
   }
   renderCart();

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#6f45cf" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>إدارة المتجر — ZAIN COSMETICS</title>
+    <link rel="icon" type="image/png" href="assets/zain-cosmetics-favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="admin.css" />
+    <script src="supabase-config.js"></script>
+    <script type="module" src="admin.js"></script>
+  </head>
+  <body>
+    <main class="admin-main">
+      <section class="connection-card" id="connection-screen" hidden>
+        <a class="admin-logo" href="./"><img src="assets/zain-cosmetics-logo.png" alt="ZAIN COSMETICS" /></a>
+        <p class="eyebrow">إعداد آمن لمرة واحدة</p>
+        <h1>اربط قاعدة بيانات متجرك</h1>
+        <p class="connection-description">اللوحة تستخدم قاعدة بياناتك في Supabase. أنشئ مشروعًا مجانيًا، شغّل ملف الإعداد، وأدخل مفتاح النشر العام هنا.</p>
+        <ol class="setup-steps">
+          <li>أنشئ مشروعًا من <a href="https://supabase.com/dashboard/projects" target="_blank" rel="noreferrer">لوحة Supabase</a>.</li>
+          <li>من <strong>Authentication → URL Configuration</strong> أضف رابط الإدارة إلى روابط التحويل المسموح بها، ثم ادعُ المالك من <strong>Authentication → Users</strong>.</li>
+          <li>من <strong>SQL Editor</strong> استبدل <code>replace-with-your-email@example.com</code> بالبريد الذي دعوته، والصق ملف <code>supabase/setup.sql</code> ثم شغّله.</li>
+          <li>من <strong>Project Settings → API</strong> انسخ رابط المشروع ومفتاح <strong>anon / publishable</strong>. لا تستخدم أبدًا مفتاح <code>service_role</code>.</li>
+        </ol>
+        <form id="connection-form" class="connection-form">
+          <label for="project-url">رابط مشروع Supabase</label>
+          <input id="project-url" name="url" type="url" inputmode="url" placeholder="https://your-project.supabase.co" autocomplete="url" required />
+          <label for="public-key">مفتاح النشر العام (anon / publishable)</label>
+          <textarea id="public-key" name="anonKey" rows="3" autocomplete="off" required></textarea>
+          <button class="button button-primary" type="submit">حفظ الاتصال وفتح لوحة التحكم</button>
+        </form>
+        <p class="screen-message" id="connection-message" role="status"></p>
+      </section>
+
+      <section class="login-card" id="login-screen" hidden>
+        <a class="admin-logo" href="./"><img src="assets/zain-cosmetics-logo.png" alt="ZAIN COSMETICS" /></a>
+        <p class="eyebrow">منطقة خاصة بصاحبة المتجر</p>
+        <h1>أهلًا بعودتك</h1>
+        <p class="login-description">سجّلي الدخول بالبريد وكلمة المرور التي أُعدّت لمالك المتجر في Supabase.</p>
+        <form id="login-form" class="connection-form">
+          <label for="admin-email">البريد الإلكتروني</label>
+          <input id="admin-email" name="email" type="email" autocomplete="username" required />
+          <label for="admin-password">كلمة المرور</label>
+          <input id="admin-password" name="password" type="password" autocomplete="current-password" required />
+          <button class="button button-primary" type="submit">تسجيل الدخول بأمان</button>
+        </form>
+        <p class="screen-message" id="login-message" role="status"></p>
+      </section>
+
+      <section class="dashboard" id="dashboard-screen" hidden>
+        <header class="dashboard-header">
+          <a class="admin-logo dashboard-logo" href="./" aria-label="العودة إلى واجهة المتجر">
+            <img src="assets/zain-cosmetics-logo.png" alt="ZAIN COSMETICS" />
+          </a>
+          <div class="dashboard-title"><p class="eyebrow">إدارة المتجر</p><h1>أهلًا بعودتك ✦</h1></div>
+          <div class="account-controls"><span class="account-email" id="account-email"></span><button class="button button-light" id="sign-out" type="button">تسجيل الخروج</button></div>
+        </header>
+        <div class="dashboard-layout">
+          <nav class="admin-nav" aria-label="أقسام لوحة التحكم">
+            <button class="nav-item is-active" type="button" data-view-target="overview"><span aria-hidden="true">⌂</span> نظرة عامة</button>
+            <button class="nav-item" type="button" data-view-target="products"><span aria-hidden="true">✳</span> المنتجات والمخزون</button>
+            <button class="nav-item" type="button" data-view-target="orders"><span aria-hidden="true">▤</span> الطلبات</button>
+            <a class="nav-back" href="./">↗ العودة إلى واجهة المتجر</a>
+          </nav>
+          <div class="dashboard-content">
+            <section class="dashboard-view" data-view="overview">
+              <div class="welcome-panel"><div><p class="eyebrow">متجرك، تحت سيطرتك</p><h2>كل شيء بخير في <em>ZAIN.</em></h2><p>حدّثي مخزونك ومنتجاتك؛ التغييرات المنشورة تظهر تلقائيًا على واجهة المتجر.</p></div><span class="welcome-flower" aria-hidden="true">✳</span></div>
+              <div class="stats-grid">
+                <article class="stat-card"><span>كل المنتجات</span><strong id="stats-products">—</strong><small>منتج في مخزونك</small></article>
+                <article class="stat-card"><span>منتجات ظاهرة للزوار</span><strong id="stats-active">—</strong><small>منتج متاح في المتجر</small></article>
+                <article class="stat-card"><span>طلبات تحتاج متابعة</span><strong id="stats-pending">—</strong><small>طلب بانتظار التأكيد</small></article>
+                <article class="stat-card"><span>إجمالي المبيعات المسجلة</span><strong id="stats-revenue">$0.00</strong><small>باستثناء الطلبات الملغاة</small></article>
+              </div>
+              <div class="recent-panel"><div class="section-bar"><div><p class="eyebrow">آخر ما تم تسجيله</p><h2>أحدث الطلبات</h2></div><button class="text-button" type="button" data-go-view="orders">عرض كل الطلبات ←</button></div><div class="table-wrap"><table><thead><tr><th>رقم الطلب</th><th>العميل</th><th>التفاصيل</th><th>الإجمالي</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody id="recent-orders"></tbody></table></div><p class="empty-state" id="recent-empty" hidden>لم تُسجل أي طلبات بعد.</p></div>
+            </section>
+
+            <section class="dashboard-view" data-view="products" hidden>
+              <div class="section-bar page-section-bar"><div><p class="eyebrow">كل ما تعرضينه</p><h2>المنتجات والمخزون</h2><p>تعديلات المنتجات الظاهرة تنعكس مباشرة على المتجر.</p></div><button class="button button-primary" id="add-product" type="button">＋ أضيفي منتجًا</button></div>
+              <div class="table-panel"><div class="table-wrap"><table><thead><tr><th>المنتج</th><th>التصنيف</th><th>السعر</th><th>المخزون</th><th>حالة الظهور</th><th>إجراءات</th></tr></thead><tbody id="products-table"></tbody></table></div><p class="empty-state" id="products-empty" hidden>لا توجد منتجات بعد. أضيفي أول منتج للبدء.</p></div>
+            </section>
+
+            <section class="dashboard-view" data-view="orders" hidden>
+              <div class="section-bar page-section-bar"><div><p class="eyebrow">سجّلي مبيعاتك يدويًا</p><h2>الطلبات</h2><p>أضيفي الطلبات التي تصلك، وتابعي حالتها من هنا.</p></div><button class="button button-primary" id="add-order" type="button">＋ سجّلي طلبًا</button></div>
+              <div class="table-panel"><div class="table-wrap"><table><thead><tr><th>رقم الطلب</th><th>العميل</th><th>رقم الهاتف</th><th>تفاصيل الطلب</th><th>الإجمالي</th><th>الحالة</th><th>تاريخ التسجيل</th></tr></thead><tbody id="orders-table"></tbody></table></div><p class="empty-state" id="orders-empty" hidden>لا توجد طلبات بعد. سجّلي أول طلب عندما يصلك.</p></div>
+            </section>
+          </div>
+        </div>
+        <p class="dashboard-message" id="dashboard-message" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <dialog class="editor-dialog" id="product-dialog">
+      <form id="product-form" class="dialog-form">
+        <div class="dialog-title"><div><p class="eyebrow">تحديث تشكيلة ZAIN</p><h2 id="product-dialog-title">أضيفي منتجًا</h2></div><button class="close-dialog" type="button" data-close-dialog aria-label="إغلاق">×</button></div>
+        <input name="id" type="hidden" />
+        <label for="product-name">اسم المنتج</label><input id="product-name" name="name" maxlength="120" required />
+        <label for="product-category">التصنيف</label><input id="product-category" name="category" maxlength="60" placeholder="عناية بالبشرة، مكياج..." required />
+        <label for="product-description">وصف المنتج</label><textarea id="product-description" name="description" maxlength="1000" rows="3"></textarea>
+        <div class="field-pair"><div><label for="product-price">السعر (USD)</label><input id="product-price" name="price" type="number" min="0" step="0.01" required /></div><div><label for="product-stock">الكمية المتوفرة</label><input id="product-stock" name="stock" type="number" min="0" step="1" required /></div></div>
+        <label for="product-image">رابط صورة المنتج (اختياري)</label><input id="product-image" name="image_url" type="url" inputmode="url" placeholder="https://..." />
+        <label class="checkbox-field"><input name="featured" type="checkbox" /> اختاري كمنتج مميز</label>
+        <label class="checkbox-field"><input name="is_active" type="checkbox" checked /> إظهار المنتج في المتجر</label>
+        <p class="form-error" id="product-error" role="alert"></p>
+        <button class="button button-primary dialog-submit" type="submit">حفظ المنتج</button>
+      </form>
+    </dialog>
+
+    <dialog class="editor-dialog" id="order-dialog">
+      <form id="order-form" class="dialog-form">
+        <div class="dialog-title"><div><p class="eyebrow">مبيعاتك، مرتبة</p><h2>تسجيل طلب جديد</h2></div><button class="close-dialog" type="button" data-close-dialog aria-label="إغلاق">×</button></div>
+        <label for="order-customer">اسم العميل</label><input id="order-customer" name="customer_name" maxlength="120" autocomplete="name" required />
+        <label for="order-phone">رقم التواصل</label><input id="order-phone" name="customer_phone" type="tel" maxlength="40" autocomplete="tel" required />
+        <label for="order-item">المنتج أو تفاصيل الطلب</label><input id="order-item" name="item_name" maxlength="120" required />
+        <div class="field-pair"><div><label for="order-quantity">الكمية</label><input id="order-quantity" name="quantity" type="number" min="1" step="1" value="1" required /></div><div><label for="order-unit-price">سعر القطعة (USD)</label><input id="order-unit-price" name="unit_price" type="number" min="0" step="0.01" required /></div></div>
+        <p class="order-total-preview">إجمالي الطلب: <strong id="order-total-preview">$0.00</strong></p>
+        <label for="order-notes">ملاحظات خاصة (اختياري)</label><textarea id="order-notes" name="notes" maxlength="1000" rows="3"></textarea>
+        <p class="privacy-note">بيانات العملاء محفوظة في قاعدة بيانات متجرك الخاصة، ولا يطّلع عليها الزوار.</p>
+        <p class="form-error" id="order-error" role="alert"></p>
+        <button class="button button-primary dialog-submit" type="submit">حفظ الطلب</button>
+      </form>
+    </dialog>
+    <div class="admin-toast" id="admin-toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

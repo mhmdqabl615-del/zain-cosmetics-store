@@ -55,6 +55,8 @@ h1 em, h2 em { color: #b78376; font-weight: 400; }
 .trust-strip { min-height: 72px; padding: 15px 7%; display: flex; align-items: center; justify-content: space-between; gap: 15px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: #756b64; font-size: 9px; letter-spacing: .04em; }
 .trust-strip span::first-letter { color: #bc887d; }
 .shop-section { padding: 99px 7.2% 106px; }
+.catalog-feedback { margin: 0 0 20px; padding: 13px 16px; background: #f3ece8; color: #725951; font-size: 11px; line-height: 1.8; }
+.catalog-feedback[hidden] { display: none; }
 .section-heading { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 37px; }
 .section-heading .eyebrow { margin-bottom: 12px; }
 h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
@@ -63,6 +65,14 @@ h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
 .text-link:hover span { transform: translateX(4px); }
 .product-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 18px; }
 .product-image { position: relative; display: grid; height: clamp(220px, 28vw, 350px); place-items: center; overflow: hidden; }
+.product-image.product-image-live { background: linear-gradient(145deg,#eee7e0,#e5d8d0); }
+.live-product-photo { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.live-product-art { position: relative; z-index: 1; display: flex; width: 72%; min-height: 55%; align-items: center; justify-content: center; flex-direction: column; padding: 16px; background: #6f45cf; color: #fff; text-align: center; }
+.live-product-art span { margin-bottom: 13px; color: #b5e526; font-family: var(--serif); font-size: 9px; letter-spacing: .17em; }
+.live-product-art strong { font-family: var(--serif); font-size: clamp(19px,2.4vw,33px); font-weight: 400; line-height: 1.2; }
+.live-product-art small { margin-top: 10px; color: #ffffffc2; font-size: 9px; }
+.product-image-live::before, .product-image-live::after { pointer-events: none; }
+.product-grid-live .swatches { display: none; }
 .image-serum { background: #e9e0d7; }
 .image-blush { background: #eededb; }
 .image-lip { background: #eee5db; }
@@ -74,6 +84,8 @@ h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
 .tag-new { background: #f7eeeb; }
 .tag-limited { background: #f4f0e8; }
 .quick-add { position: absolute; z-index: 3; right: 12px; bottom: 12px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: #fbf8f4; color: var(--ink); cursor: pointer; font-size: 19px; transition: color .2s, background .2s, transform .2s; }
+.quick-add:disabled { background: #938a84; color: white; cursor: not-allowed; }
+.quick-add:disabled:hover { transform: none; background: #938a84; }
 .quick-add:hover { transform: rotate(90deg); background: #554a43; color: white; }
 .bottle, .compact, .lip-tube, .jar { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: 12px 19px 28px #5340331e; text-align: center; }
 .bottle span, .compact span, .lip-tube span, .jar-body span { font-family: var(--serif); font-size: 8px; letter-spacing: -.04em; }
