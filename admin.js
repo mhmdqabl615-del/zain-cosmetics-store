@@ -118,15 +118,19 @@ async function initialize() {
   }
 
   try {
+    const recoveryParams = new URLSearchParams(window.location.hash.slice(1));
     const recoveryRequested =
-      new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery" ||
+      recoveryParams.get("type") === "recovery" ||
+      (recoveryParams.has("access_token") && recoveryParams.has("refresh_token")) ||
       new URLSearchParams(window.location.search).get("type") === "recovery";
     const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
     supabase = createClient(credentials.url, credentials.anonKey, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
     });
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") showScreen("password");
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (recoveryRequested && session)) {
+        showScreen("password");
+      }
       if (event === "SIGNED_OUT") {
         signedInUser = null;
         showScreen("login");
