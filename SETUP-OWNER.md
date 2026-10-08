@@ -20,21 +20,15 @@ Only authenticated administrators can read customer names, phone numbers, or ord
 
 ## 2. Connect the public storefront to your catalog
 
-The public storefront catalog remains hidden as requested: products remain saved in Supabase and manageable in the owner dashboard, but the public page does not load or display them. The storefront and catalog renderer include category-filter support for when you decide to show products again; displaying the catalog requires adding the `supabase-config.js` and `storefront-catalog.js` script tags back to `index.html` and publishing the site.
+The public storefront is connected to your Supabase catalog. Active products with stock appear to visitors; disabled products stay hidden, and out-of-stock products are shown as sold out. Category filters are built automatically from active products.
 
-Once the database is ready:
+To manage the public catalog:
 
-1. Set the URL and public key in [`supabase-config.js`](supabase-config.js) in the public repository. For example:
+1. Add a product in the owner dashboard. Enter its section in **القسم**, or choose an existing section; new sections appear automatically from product categories.
+2. Leave **إظهار المنتج في المتجر** enabled for items that visitors should see. Set available stock to a positive number; zero-stock items display as sold out.
+3. The visitor storefront at the link above reads active products directly from Supabase. Selecting a category filter displays products in that section.
 
-   ```js
-   window.ZAIN_SUPABASE_CONFIG = {
-     url: "https://your-project.supabase.co",
-     anonKey: "your-project-anon-or-publishable-key",
-   };
-   ```
-
-2. Restore the storefront catalog script tags in `index.html` and commit the change. GitHub Pages automatically publishes the connected catalog. The dashboard saves the same public settings locally in the browser, so repeat its connection step on another browser if needed.
-3. Add a product in the dashboard and type its section in **القسم** (or choose an existing section). Each product belongs to one section; the public shop builds a filter for every section represented by an active product. Active products appear in the storefront catalog; hidden products do not. Products without stock appear as sold out.
+The configuration in [`supabase-config.js`](supabase-config.js) contains the project's URL and **public publishable/anon key**, intended for client-side use. Keep RLS enabled as defined in `supabase/setup.sql`; never put a `service_role` or secret key in that file.
 
 ## 3. Record real orders
 
