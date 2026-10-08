@@ -386,6 +386,15 @@ document.querySelector("#connection-form").addEventListener("submit", async (eve
   }
 });
 
+document.querySelector("#change-connection").addEventListener("click", () => {
+  const credentials = getConfiguredCredentials();
+  const form = document.querySelector("#connection-form");
+  form.elements.url.value = credentials.url;
+  form.elements.anonKey.value = credentials.anonKey;
+  connectionMessage.textContent = "";
+  showScreen("connection");
+});
+
 document.querySelector("#login-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const form = event.currentTarget;
