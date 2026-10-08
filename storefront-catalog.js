@@ -17,13 +17,31 @@ function createElement(tag, className, text) {
 function renderProducts(products) {
   const grid = document.querySelector(".product-grid");
   const notice = document.querySelector(".catalog-feedback");
+  const filters = document.querySelector(".store-category-filters");
   grid.replaceChildren();
   grid.classList.add("product-grid-live");
   notice.hidden = products.length > 0;
   notice.textContent = products.length ? "" : "لا توجد منتجات متاحة للشراء في الوقت الحالي.";
+  filters.replaceChildren();
+  filters.hidden = products.length === 0;
+
+  if (products.length) {
+    const categories = [
+      "الكل",
+      ...new Set(products.map((product) => product.category.trim()).filter(Boolean)),
+    ];
+    categories.forEach((category, index) => {
+      const button = createElement("button", "category-filter", category);
+      button.type = "button";
+      button.dataset.category = index === 0 ? "" : category;
+      button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
+      filters.append(button);
+    });
+  }
 
   products.forEach((product) => {
     const card = createElement("article", "product-card");
+    card.dataset.category = product.category.trim();
     const visual = createElement("div", "product-image product-image-live");
     if (product.image_url) {
       const photo = createElement("img", "live-product-photo");
@@ -72,6 +90,19 @@ function renderProducts(products) {
     grid.append(card);
   });
 }
+
+document.querySelector(".store-category-filters").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-category]");
+  if (!button) return;
+
+  const category = button.dataset.category;
+  document.querySelectorAll(".store-category-filters button").forEach((filter) => {
+    filter.setAttribute("aria-pressed", String(filter === button));
+  });
+  document.querySelectorAll(".product-card[data-category]").forEach((card) => {
+    card.hidden = Boolean(category) && card.dataset.category !== category;
+  });
+});
 
 const configuration = window.ZAIN_SUPABASE_CONFIG;
 if (configuration?.url && configuration?.anonKey) {

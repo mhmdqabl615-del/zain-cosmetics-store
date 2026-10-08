@@ -81,6 +81,10 @@ h1, h2 { margin-bottom: 0; }
 .text-button { border: 0; background: transparent; color: var(--purple); cursor: pointer; font-size: 10px; }
 .page-section-bar { margin-bottom: 19px; }
 .page-section-bar > div > p:last-child { margin: 7px 0 0; color: var(--muted); font-size: 10px; }
+.category-management { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0 0 15px; padding: 12px 15px; border: 1px solid var(--border); background: var(--panel); }
+.category-management label { font-size: 11px; font-weight: 600; }
+.category-management select { min-width: 180px; min-height: 36px; padding: 6px 10px; border: 1px solid var(--border); background: white; color: var(--ink); font: inherit; }
+.category-management span { color: var(--muted); font-size: 10px; }
 .table-panel { padding: 0 16px 6px; }
 .table-wrap { width: 100%; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; white-space: nowrap; text-align: right; }

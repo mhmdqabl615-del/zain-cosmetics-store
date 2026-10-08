@@ -204,9 +204,25 @@ async function refreshData() {
 function renderProducts() {
   const table = document.querySelector("#products-table");
   table.replaceChildren();
-  document.querySelector("#products-empty").hidden = products.length > 0;
+  const categoryFilter = document.querySelector("#product-category-filter");
+  const selectedCategory = categoryFilter.value;
+  const categories = [...new Set(products.map((product) => product.category.trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "ar"));
+  categoryFilter.replaceChildren(new Option("كل الأقسام", ""));
+  const categoryList = document.querySelector("#product-categories");
+  categoryList.replaceChildren();
+  categories.forEach((category) => {
+    categoryFilter.add(new Option(category, category));
+    categoryList.append(new Option(category, category));
+  });
+  categoryFilter.value = categories.includes(selectedCategory) ? selectedCategory : "";
 
-  products.forEach((product) => {
+  const visibleProducts = selectedCategory
+    ? products.filter((product) => product.category === selectedCategory)
+    : products;
+  document.querySelector("#products-empty").hidden = visibleProducts.length > 0;
+
+  visibleProducts.forEach((product) => {
     const row = document.createElement("tr");
     const productCell = document.createElement("td");
     const productDetails = document.createElement("div");
@@ -601,6 +617,8 @@ document.querySelector("#products-table").addEventListener("click", async (event
     showToast(product.is_active ? "تم إخفاء المنتج من المتجر." : "تم نشر المنتج في المتجر.");
   }
 });
+
+document.querySelector("#product-category-filter").addEventListener("change", renderProducts);
 
 document.querySelectorAll("input[name='quantity'], input[name='unit_price']").forEach((input) => {
   input.addEventListener("input", updateOrderPreview);

@@ -10,19 +10,19 @@
 
 ## ????? ??????
 
-- `index.html`, `styles.css`, `script.js`: ????? ?????? ??????. ???????? ????? ?????? ?? ??????? ?? ???????? ??? ?? ????? ???????? ????? ???????.
-- `storefront-catalog.js`, `supabase-config.js`: ???? ????? ?????? Supabase ?????????? ????? ???????? ??? ????? ?????? ?????? ??????.
-- `admin.html`, `admin.css`, `admin.js`: ???? ??????? ?????? ?????? ?????? ???????? ???????? ???????? ???? ??????.
-- `supabase/setup.sql`: ??????? ??????? Row Level Security (RLS) ???????? ??????.
+- `index.html`, `styles.css`, `script.js`: ????? ?????? ??????. ???????? ????? ?????? ?? ??????? ???? ?????? ????? ????? ???????? ??? ????? ???????? ?????.
+- `storefront-catalog.js`, `supabase-config.js`: ??? ?????? ????? ???????? ?????? ??????? ???????? ?????? ?????? ?????? ??? ????? ??????.
+- `admin.html`, `admin.css`, `admin.js`: ???? ??????? ?????? ?????? ?????? ???????? ???????? ???????? ???? ?????? ?????? ??? ?????.
+- `supabase/setup.sql`: ??????? ??????? Row Level Security (RLS) ???????? ??????. ??????? ?????? ??? ??????? ?????? ??? ????? ????? ????? ????????.
 - `.github/workflows/deploy-pages.yml`: ??? GitHub Pages ???????? ??? ??????? ??? ????? `main`.
 - `SETUP-OWNER.md`: ??????? ????? Supabase ????? ???????.
 
-## ??????
+## ??????? ???????
 
-- ??? `supabase-config.js` ?? ????? ????? ????? ?? ??????? ???????.
-- ?? ??? ?????? `service_role` ?? `secret` ?? ?????? ?? GitHub ?? ??? ?????.
-- ???? ?????? ???????? ?????? ??? ??? ????? ????? ????????? ?????? ?????? RLS ?????? ??????? ?????? ???????? ????? ??????.
-- ??????? ?????? ?????? ?? ???? ???????? ?? ???? ????? ??? ????????? ?????.
+- ??? ????? ????? ???? ??? ????? ?? ??? **?????** ?? ???? ????? ???????. ????? ??? ???? ???? ????? ???? ????? ????????? ????? ????? ???????? ??? ????? ?? ???? ???????.
+- ????? ????? ?????? ???????? ????? ????????? ???? ?????? ????? ???????? ?????? ??????. ??? ???????? ?????? ???? ??? ????.
+- ??? `supabase-config.js` ?? ????? ????? ????? ?? ??????? ???????. ?? ??? ?????? `service_role` ?? `secret` ?? ?????? ?? GitHub ?? ??? ?????.
+- ????? ?????? RLS ????? ?????? ??????? ???????? ?????? ????? ??????. ??????? ?????? ??????? ?? ???? ????? ??? ?????????.
 
 ## ??????? ????? ?????? ?????
 
@@ -149,6 +149,10 @@ h1, h2 { margin-bottom: 0; }
 .text-button { border: 0; background: transparent; color: var(--purple); cursor: pointer; font-size: 10px; }
 .page-section-bar { margin-bottom: 19px; }
 .page-section-bar > div > p:last-child { margin: 7px 0 0; color: var(--muted); font-size: 10px; }
+.category-management { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0 0 15px; padding: 12px 15px; border: 1px solid var(--border); background: var(--panel); }
+.category-management label { font-size: 11px; font-weight: 600; }
+.category-management select { min-width: 180px; min-height: 36px; padding: 6px 10px; border: 1px solid var(--border); background: white; color: var(--ink); font: inherit; }
+.category-management span { color: var(--muted); font-size: 10px; }
 .table-panel { padding: 0 16px 6px; }
 .table-wrap { width: 100%; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; white-space: nowrap; text-align: right; }
@@ -336,6 +340,11 @@ td { padding: 13px 11px; border-top: 1px solid #eee9e4; color: #4f4945; font-siz
 
             <section class="dashboard-view" data-view="products" hidden>
               <div class="section-bar page-section-bar"><div><p class="eyebrow">كل ما تعرضينه</p><h2>المنتجات والمخزون</h2><p>تعديلات المنتجات الظاهرة تنعكس مباشرة على المتجر.</p></div><button class="button button-primary" id="add-product" type="button">＋ أضيفي منتجًا</button></div>
+              <div class="category-management">
+                <label for="product-category-filter">قسم المنتجات</label>
+                <select id="product-category-filter"><option value="">كل الأقسام</option></select>
+                <span>اكتبي اسم قسم جديد في خانة التصنيف عند إضافة منتج؛ سيظهر كقسم تلقائيًا.</span>
+              </div>
               <div class="table-panel"><div class="table-wrap"><table><thead><tr><th>المنتج</th><th>التصنيف</th><th>السعر</th><th>المخزون</th><th>حالة الظهور</th><th>إجراءات</th></tr></thead><tbody id="products-table"></tbody></table></div><p class="empty-state" id="products-empty" hidden>لا توجد منتجات بعد. أضيفي أول منتج للبدء.</p></div>
             </section>
 
@@ -354,7 +363,7 @@ td { padding: 13px 11px; border-top: 1px solid #eee9e4; color: #4f4945; font-siz
         <div class="dialog-title"><div><p class="eyebrow">تحديث تشكيلة ZAIN</p><h2 id="product-dialog-title">أضيفي منتجًا</h2></div><button class="close-dialog" type="button" data-close-dialog aria-label="إغلاق">×</button></div>
         <input name="id" type="hidden" />
         <label for="product-name">اسم المنتج</label><input id="product-name" name="name" maxlength="120" required />
-        <label for="product-category">التصنيف</label><input id="product-category" name="category" maxlength="60" placeholder="عناية بالبشرة، مكياج..." required />
+        <label for="product-category">القسم</label><input id="product-category" name="category" list="product-categories" maxlength="60" placeholder="مثل: العناية بالبشرة أو المكياج" required /><datalist id="product-categories"></datalist>
         <label for="product-description">وصف المنتج</label><textarea id="product-description" name="description" maxlength="1000" rows="3"></textarea>
         <div class="field-pair"><div><label for="product-price">السعر (USD)</label><input id="product-price" name="price" type="number" min="0" step="0.01" required /></div><div><label for="product-stock">الكمية المتوفرة</label><input id="product-stock" name="stock" type="number" min="0" step="1" required /></div></div>
         <label for="product-image">رابط صورة المنتج (اختياري)</label><input id="product-image" name="image_url" type="url" inputmode="url" placeholder="https://..." />
@@ -593,9 +602,25 @@ async function refreshData() {
 function renderProducts() {
   const table = document.querySelector("#products-table");
   table.replaceChildren();
-  document.querySelector("#products-empty").hidden = products.length > 0;
+  const categoryFilter = document.querySelector("#product-category-filter");
+  const selectedCategory = categoryFilter.value;
+  const categories = [...new Set(products.map((product) => product.category.trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "ar"));
+  categoryFilter.replaceChildren(new Option("كل الأقسام", ""));
+  const categoryList = document.querySelector("#product-categories");
+  categoryList.replaceChildren();
+  categories.forEach((category) => {
+    categoryFilter.add(new Option(category, category));
+    categoryList.append(new Option(category, category));
+  });
+  categoryFilter.value = categories.includes(selectedCategory) ? selectedCategory : "";
 
-  products.forEach((product) => {
+  const visibleProducts = selectedCategory
+    ? products.filter((product) => product.category === selectedCategory)
+    : products;
+  document.querySelector("#products-empty").hidden = visibleProducts.length > 0;
+
+  visibleProducts.forEach((product) => {
     const row = document.createElement("tr");
     const productCell = document.createElement("td");
     const productDetails = document.createElement("div");
@@ -991,6 +1016,8 @@ document.querySelector("#products-table").addEventListener("click", async (event
   }
 });
 
+document.querySelector("#product-category-filter").addEventListener("change", renderProducts);
+
 document.querySelectorAll("input[name='quantity'], input[name='unit_price']").forEach((input) => {
   input.addEventListener("input", updateOrderPreview);
 });
@@ -1133,6 +1160,8 @@ await initialize();
         </div>
 
         <p class="catalog-feedback" role="status" aria-live="polite">المنتجات غير متاحة حاليًا. تابعينا قريبًا.</p>
+        <nav class="store-category-filters" aria-label="Product categories" hidden></nav>
+        <div class="product-grid"></div>
       </section>
 
       <section class="ritual-section" id="our-ritual">
@@ -1375,7 +1404,7 @@ Only authenticated administrators can read customer names, phone numbers, or ord
 
 ## 2. Connect the public storefront to your catalog
 
-The public storefront catalog is currently hidden: products remain saved in Supabase and manageable in the owner dashboard, but the public page does not load or display them. To show the catalog again after setup, restore both `supabase-config.js` and `storefront-catalog.js` script tags in `index.html` and publish the site.
+The public storefront catalog remains hidden as requested: products remain saved in Supabase and manageable in the owner dashboard, but the public page does not load or display them. The storefront and catalog renderer include category-filter support for when you decide to show products again; displaying the catalog requires adding the `supabase-config.js` and `storefront-catalog.js` script tags back to `index.html` and publishing the site.
 
 Once the database is ready:
 
@@ -1389,7 +1418,7 @@ Once the database is ready:
    ```
 
 2. Restore the storefront catalog script tags in `index.html` and commit the change. GitHub Pages automatically publishes the connected catalog. The dashboard saves the same public settings locally in the browser, so repeat its connection step on another browser if needed.
-3. Add products in the dashboard and set their actual stock. Active products appear in the storefront catalog; hidden products do not. Products without stock appear as sold out.
+3. Add a product in the dashboard and type its section in **القسم** (or choose an existing section). Each product belongs to one section; the public shop builds a filter for every section represented by an active product. Active products appear in the storefront catalog; hidden products do not. Products without stock appear as sold out.
 
 ## 3. Record real orders
 
@@ -1425,13 +1454,31 @@ function createElement(tag, className, text) {
 function renderProducts(products) {
   const grid = document.querySelector(".product-grid");
   const notice = document.querySelector(".catalog-feedback");
+  const filters = document.querySelector(".store-category-filters");
   grid.replaceChildren();
   grid.classList.add("product-grid-live");
   notice.hidden = products.length > 0;
   notice.textContent = products.length ? "" : "لا توجد منتجات متاحة للشراء في الوقت الحالي.";
+  filters.replaceChildren();
+  filters.hidden = products.length === 0;
+
+  if (products.length) {
+    const categories = [
+      "الكل",
+      ...new Set(products.map((product) => product.category.trim()).filter(Boolean)),
+    ];
+    categories.forEach((category, index) => {
+      const button = createElement("button", "category-filter", category);
+      button.type = "button";
+      button.dataset.category = index === 0 ? "" : category;
+      button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
+      filters.append(button);
+    });
+  }
 
   products.forEach((product) => {
     const card = createElement("article", "product-card");
+    card.dataset.category = product.category.trim();
     const visual = createElement("div", "product-image product-image-live");
     if (product.image_url) {
       const photo = createElement("img", "live-product-photo");
@@ -1480,6 +1527,19 @@ function renderProducts(products) {
     grid.append(card);
   });
 }
+
+document.querySelector(".store-category-filters").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-category]");
+  if (!button) return;
+
+  const category = button.dataset.category;
+  document.querySelectorAll(".store-category-filters button").forEach((filter) => {
+    filter.setAttribute("aria-pressed", String(filter === button));
+  });
+  document.querySelectorAll(".product-card[data-category]").forEach((card) => {
+    card.hidden = Boolean(category) && card.dataset.category !== category;
+  });
+});
 
 const configuration = window.ZAIN_SUPABASE_CONFIG;
 if (configuration?.url && configuration?.anonKey) {
@@ -1568,6 +1628,11 @@ h1 em, h2 em { color: #b78376; font-weight: 400; }
 .shop-section { padding: 99px 7.2% 106px; }
 .catalog-feedback { margin: 0 0 20px; padding: 13px 16px; background: #f3ece8; color: #725951; font-size: 11px; line-height: 1.8; }
 .catalog-feedback[hidden] { display: none; }
+.store-category-filters { display: flex; gap: 9px; margin: 0 0 25px; overflow-x: auto; scrollbar-width: thin; }
+.store-category-filters[hidden] { display: none; }
+.category-filter { flex: 0 0 auto; padding: 10px 16px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: #625951; cursor: pointer; font-size: 10px; }
+.category-filter[aria-pressed="true"] { border-color: var(--brand-purple); background: var(--brand-purple); color: white; }
+.product-card[hidden] { display: none; }
 .section-heading { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 37px; }
 .section-heading .eyebrow { margin-bottom: 12px; }
 h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }

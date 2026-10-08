@@ -20,7 +20,7 @@ Only authenticated administrators can read customer names, phone numbers, or ord
 
 ## 2. Connect the public storefront to your catalog
 
-The public storefront catalog is currently hidden: products remain saved in Supabase and manageable in the owner dashboard, but the public page does not load or display them. To show the catalog again after setup, restore both `supabase-config.js` and `storefront-catalog.js` script tags in `index.html` and publish the site.
+The public storefront catalog remains hidden as requested: products remain saved in Supabase and manageable in the owner dashboard, but the public page does not load or display them. The storefront and catalog renderer include category-filter support for when you decide to show products again; displaying the catalog requires adding the `supabase-config.js` and `storefront-catalog.js` script tags back to `index.html` and publishing the site.
 
 Once the database is ready:
 
@@ -34,7 +34,7 @@ Once the database is ready:
    ```
 
 2. Restore the storefront catalog script tags in `index.html` and commit the change. GitHub Pages automatically publishes the connected catalog. The dashboard saves the same public settings locally in the browser, so repeat its connection step on another browser if needed.
-3. Add products in the dashboard and set their actual stock. Active products appear in the storefront catalog; hidden products do not. Products without stock appear as sold out.
+3. Add a product in the dashboard and type its section in **القسم** (or choose an existing section). Each product belongs to one section; the public shop builds a filter for every section represented by an active product. Active products appear in the storefront catalog; hidden products do not. Products without stock appear as sold out.
 
 ## 3. Record real orders
 

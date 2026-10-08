@@ -101,6 +101,11 @@
 
             <section class="dashboard-view" data-view="products" hidden>
               <div class="section-bar page-section-bar"><div><p class="eyebrow">كل ما تعرضينه</p><h2>المنتجات والمخزون</h2><p>تعديلات المنتجات الظاهرة تنعكس مباشرة على المتجر.</p></div><button class="button button-primary" id="add-product" type="button">＋ أضيفي منتجًا</button></div>
+              <div class="category-management">
+                <label for="product-category-filter">قسم المنتجات</label>
+                <select id="product-category-filter"><option value="">كل الأقسام</option></select>
+                <span>اكتبي اسم قسم جديد في خانة التصنيف عند إضافة منتج؛ سيظهر كقسم تلقائيًا.</span>
+              </div>
               <div class="table-panel"><div class="table-wrap"><table><thead><tr><th>المنتج</th><th>التصنيف</th><th>السعر</th><th>المخزون</th><th>حالة الظهور</th><th>إجراءات</th></tr></thead><tbody id="products-table"></tbody></table></div><p class="empty-state" id="products-empty" hidden>لا توجد منتجات بعد. أضيفي أول منتج للبدء.</p></div>
             </section>
 
@@ -119,7 +124,7 @@
         <div class="dialog-title"><div><p class="eyebrow">تحديث تشكيلة ZAIN</p><h2 id="product-dialog-title">أضيفي منتجًا</h2></div><button class="close-dialog" type="button" data-close-dialog aria-label="إغلاق">×</button></div>
         <input name="id" type="hidden" />
         <label for="product-name">اسم المنتج</label><input id="product-name" name="name" maxlength="120" required />
-        <label for="product-category">التصنيف</label><input id="product-category" name="category" maxlength="60" placeholder="عناية بالبشرة، مكياج..." required />
+        <label for="product-category">القسم</label><input id="product-category" name="category" list="product-categories" maxlength="60" placeholder="مثل: العناية بالبشرة أو المكياج" required /><datalist id="product-categories"></datalist>
         <label for="product-description">وصف المنتج</label><textarea id="product-description" name="description" maxlength="1000" rows="3"></textarea>
         <div class="field-pair"><div><label for="product-price">السعر (USD)</label><input id="product-price" name="price" type="number" min="0" step="0.01" required /></div><div><label for="product-stock">الكمية المتوفرة</label><input id="product-stock" name="stock" type="number" min="0" step="1" required /></div></div>
         <label for="product-image">رابط صورة المنتج (اختياري)</label><input id="product-image" name="image_url" type="url" inputmode="url" placeholder="https://..." />
