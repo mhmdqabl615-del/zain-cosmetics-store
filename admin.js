@@ -122,7 +122,8 @@ async function initialize() {
     const recoveryRequested =
       recoveryParams.get("type") === "recovery" ||
       (recoveryParams.has("access_token") && recoveryParams.has("refresh_token")) ||
-      new URLSearchParams(window.location.search).get("type") === "recovery";
+      new URLSearchParams(window.location.search).get("type") === "recovery" ||
+      new URLSearchParams(window.location.search).get("recovery") === "1";
     const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
     supabase = createClient(credentials.url, credentials.anonKey, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
@@ -408,6 +409,39 @@ document.querySelector("#login-form").addEventListener("submit", async (event) =
   } finally {
     button.disabled = false;
     button.textContent = originalLabel;
+  }
+});
+
+document.querySelector("#request-password-reset").addEventListener("click", async (event) => {
+  const form = document.querySelector("#login-form");
+  const emailInput = form.elements.email;
+  const email = emailInput.value.trim();
+  const button = event.currentTarget;
+  showLoginMessage("");
+
+  if (!email) {
+    showLoginMessage("اكتبي بريد حساب المالك أولًا، ثم اضغطي هنا لإرسال رابط استعادة كلمة المرور.");
+    emailInput.focus();
+    return;
+  }
+
+  button.disabled = true;
+  try {
+    const redirectTo = new URL("./admin.html?recovery=1", window.location.href).href;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) throw error;
+    loginMessage.style.color = "#47734a";
+    showLoginMessage("أرسلنا رابط الاستعادة إن كان البريد مسجلًا. افحصي الوارد وSpam، واستخدمي أحدث رسالة فقط.");
+  } catch (error) {
+    console.error("Unable to send the store administrator's password recovery email.", error);
+    loginMessage.style.color = "";
+    showLoginMessage(
+      error.status === 429
+        ? "وصلنا لحد إرسال الرسائل مؤقتًا. انتظري قليلًا قبل طلب رابط جديد."
+        : `تعذّر إرسال رابط الاستعادة: ${error.message}`,
+    );
+  } finally {
+    button.disabled = false;
   }
 });
 

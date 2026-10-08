@@ -43,6 +43,8 @@ h1, h2 { margin-bottom: 0; }
 .button-light { border: 1px solid var(--border); background: white; color: var(--ink); }
 .button-light:hover { border-color: var(--purple); color: var(--purple); }
 .connection-form .button { margin-top: 7px; }
+.password-reset-link { align-self: center; padding: 8px; border: 0; background: transparent; color: var(--purple); cursor: pointer; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
+.password-reset-link:disabled { cursor: wait; opacity: .65; }
 .screen-message { min-height: 16px; margin: 13px 0 0; color: #9b433a; font-size: 11px; line-height: 1.7; }
 .dashboard { min-height: calc(100vh - 68px); }
 .dashboard-header { display: flex; align-items: center; gap: 20px; padding: 3px 3px 20px; border-bottom: 1px solid var(--border); }
