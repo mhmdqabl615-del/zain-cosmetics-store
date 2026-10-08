@@ -1,8 +1,10 @@
 const connectionScreen = document.querySelector("#connection-screen");
 const loginScreen = document.querySelector("#login-screen");
+const passwordScreen = document.querySelector("#password-screen");
 const dashboardScreen = document.querySelector("#dashboard-screen");
 const loginMessage = document.querySelector("#login-message");
 const connectionMessage = document.querySelector("#connection-message");
+const passwordMessage = document.querySelector("#password-message");
 const dashboardMessage = document.querySelector("#dashboard-message");
 const toast = document.querySelector("#admin-toast");
 const productDialog = document.querySelector("#product-dialog");
@@ -60,6 +62,7 @@ function isValidProjectUrl(value) {
 function showScreen(screen) {
   connectionScreen.hidden = screen !== "connection";
   loginScreen.hidden = screen !== "login";
+  passwordScreen.hidden = screen !== "password";
   dashboardScreen.hidden = screen !== "dashboard";
 }
 
@@ -115,24 +118,30 @@ async function initialize() {
   }
 
   try {
+    const recoveryRequested =
+      new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery" ||
+      new URLSearchParams(window.location.search).get("type") === "recovery";
     const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
     supabase = createClient(credentials.url, credentials.anonKey, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
     });
-    const { data, error } = await supabase.auth.getSession();
-    if (error) throw error;
-    if (data.session) {
-      await startDashboard(data.session.user);
-    } else {
-      showScreen("login");
-    }
-
     supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") showScreen("password");
       if (event === "SIGNED_OUT") {
         signedInUser = null;
         showScreen("login");
       }
     });
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    if (recoveryRequested && data.session) {
+      showScreen("password");
+    } else if (data.session) {
+      await startDashboard(data.session.user);
+    } else {
+      showScreen("login");
+    }
+
   } catch (error) {
     console.error("Unable to connect to the store's Supabase project.", error);
     showScreen("connection");
@@ -395,6 +404,39 @@ document.querySelector("#login-form").addEventListener("submit", async (event) =
   } finally {
     button.disabled = false;
     button.textContent = originalLabel;
+  }
+});
+
+document.querySelector("#password-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const password = form.elements.password.value;
+  const confirmPassword = form.elements.confirmPassword.value;
+  const button = form.querySelector("button[type='submit']");
+  passwordMessage.textContent = "";
+
+  if (password.length < 8) {
+    passwordMessage.textContent = "اختاري كلمة مرور من 8 أحرف على الأقل.";
+    return;
+  }
+  if (password !== confirmPassword) {
+    passwordMessage.textContent = "كلمتا المرور غير متطابقتين.";
+    return;
+  }
+
+  button.disabled = true;
+  try {
+    const { data, error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
+    window.history.replaceState({}, document.title, window.location.pathname);
+    form.reset();
+    await startDashboard(data.user);
+    showToast("تم حفظ كلمة المرور الجديدة.");
+  } catch (error) {
+    console.error("Unable to update the store administrator's password.", error);
+    passwordMessage.textContent = `تعذّر حفظ كلمة المرور: ${error.message}`;
+  } finally {
+    button.disabled = false;
   }
 });
 
