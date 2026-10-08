@@ -20,12 +20,11 @@ Only authenticated administrators can read customer names, phone numbers, or ord
 
 ## 2. Connect the public storefront to your catalog
 
-The first connection is intentionally **not published** automatically. The publishable key is safe for a storefront only because the accompanying SQL enforces RLS; publish it only after you have run the setup script.
+The public storefront catalog is currently hidden: products remain saved in Supabase and manageable in the owner dashboard, but the public page does not load or display them. To show the catalog again after setup, restore both `supabase-config.js` and `storefront-catalog.js` script tags in `index.html` and publish the site.
 
 Once the database is ready:
 
-1. Add products in the dashboard and set their actual stock. Active products appear in the storefront catalog; hidden products do not. Products without stock appear as sold out.
-2. Set the URL and public key in [`supabase-config.js`](supabase-config.js) in the public repository. For example:
+1. Set the URL and public key in [`supabase-config.js`](supabase-config.js) in the public repository. For example:
 
    ```js
    window.ZAIN_SUPABASE_CONFIG = {
@@ -34,7 +33,8 @@ Once the database is ready:
    };
    ```
 
-3. Commit the change. GitHub Pages automatically publishes the updated catalog connection. The dashboard saves the same public settings locally in the browser, so repeat its connection step on another browser if needed.
+2. Restore the storefront catalog script tags in `index.html` and commit the change. GitHub Pages automatically publishes the connected catalog. The dashboard saves the same public settings locally in the browser, so repeat its connection step on another browser if needed.
+3. Add products in the dashboard and set their actual stock. Active products appear in the storefront catalog; hidden products do not. Products without stock appear as sold out.
 
 ## 3. Record real orders
 

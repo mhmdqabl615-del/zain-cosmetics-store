@@ -95,7 +95,7 @@ function closeCart() {
   bagButton.focus();
 }
 
-document.querySelector(".product-grid").addEventListener("click", (event) => {
+document.querySelector(".product-grid")?.addEventListener("click", (event) => {
   const button = event.target.closest(".quick-add");
   if (!button) return;
 
