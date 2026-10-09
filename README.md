@@ -1112,6 +1112,7 @@ await initialize();
       <div class="announcement-track">
         <span>A little love for your skin — free shipping over EGP 50</span>
         <span aria-hidden="true">A little love for your skin — free shipping over EGP 50</span>
+        <span aria-hidden="true">A little love for your skin — free shipping over EGP 50</span>
       </div>
     </div>
 
