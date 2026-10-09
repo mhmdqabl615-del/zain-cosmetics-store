@@ -11,7 +11,7 @@
 ## ????? ??????
 
 - `index.html`, `styles.css`, `script.js`: ????? ?????? ??????? ???? ???????? ?????? ?????? ?? Supabase.
-- `storefront-catalog.js`, `supabase-config.js`: ????? ???????? ??????? ??????? ??? ???????? ?????? ??????? ?????.
+- `storefront-catalog.js`, `product.html`, `product-details.js`, `supabase-config.js`: ????? ???????? ??????? ??????? ??? ???????? ?????? ??????? ?????.
 - `admin.html`, `admin.css`, `admin.js`: ???? ?????? ?????? ???????? ???????? ???????? ???????? ?????? ?????? ???????? ???? ??????.
 - `supabase/setup.sql`: ????? ?????? ??????? Row Level Security (RLS) ???????? ???? ??????. ??????? ?????? ????? ?????? ?????? ??? ????? ????? ????? ????????.
 - `.github/workflows/deploy-pages.yml`: ??? GitHub Pages ???????? ??? ??????? ??? ????? `main`.
@@ -1215,7 +1215,53 @@ await initialize();
     <div class="toast" role="status" aria-live="polite"></div>
     <script src="supabase-config.js?v=catalog-sections-20261008"></script>
     <script src="script.js?v=egp-currency-20261009"></script>
-    <script type="module" src="storefront-catalog.js?v=egp-currency-20261009"></script>
+    <script type="module" src="storefront-catalog.js?v=product-page-20261009"></script>
+  </body>
+</html>
+```
+
+### `product.html`
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#6f45cf" />
+    <meta name="description" content="Product details — ZAIN COSMETICS." />
+    <title>Product details — ZAIN COSMETICS</title>
+    <link rel="icon" type="image/png" href="assets/zain-cosmetics-favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand-link" href="./" aria-label="ZAIN COSMETICS home">
+        <img class="brand-logo" src="assets/zain-cosmetics-logo.png" alt="ZAIN COSMETICS" />
+      </a>
+      <a class="text-link product-detail-back" href="./#shop">Back to shop <span aria-hidden="true">→</span></a>
+    </header>
+    <main class="product-detail-page">
+      <p class="product-detail-message" role="status" aria-live="polite">Loading product details…</p>
+      <article class="product-detail" hidden>
+        <div class="product-image product-image-live product-detail-visual"></div>
+        <div class="product-detail-info">
+          <p class="product-detail-category"></p>
+          <h1></h1>
+          <p class="product-detail-price"></p>
+          <p class="product-detail-description"></p>
+          <p class="product-detail-stock"></p>
+        </div>
+      </article>
+    </main>
+    <script src="supabase-config.js?v=egp-currency-20261009"></script>
+    <script type="module" src="product-details.js?v=product-page-20261009"></script>
   </body>
 </html>
 ```
@@ -1493,14 +1539,18 @@ function renderProducts(products) {
     const card = createElement("article", "product-card");
     card.dataset.category = product.category.trim();
     const visual = createElement("div", "product-image product-image-live");
+    const imageLink = createElement("a", "product-image-link");
+    imageLink.href = `product.html?id=${encodeURIComponent(product.id)}`;
+    imageLink.setAttribute("aria-label", `View ${product.name}`);
     if (product.image_url) {
       const photo = createElement("img", "live-product-photo");
       photo.src = product.image_url;
       photo.alt = product.name;
       photo.loading = "lazy";
       photo.onerror = () => photo.remove();
-      visual.append(photo);
+      imageLink.append(photo);
     }
+    visual.append(imageLink);
 
     if (Number(product.stock) < 1) {
       visual.append(createElement("span", "product-tag", "Sold out"));
@@ -1521,6 +1571,9 @@ function renderProducts(products) {
     );
     visual.append(add);
 
+    const infoLink = createElement("a", "product-info-link");
+    infoLink.href = imageLink.href;
+    infoLink.setAttribute("aria-label", `View ${product.name}`);
     const info = createElement("div", "product-info");
     const details = document.createElement("div");
     details.append(
@@ -1528,7 +1581,8 @@ function renderProducts(products) {
       createElement("p", "", product.description || product.category),
     );
     info.append(details, createElement("span", "", formatMoney(product.price)));
-    card.append(visual, info);
+    infoLink.append(info);
+    card.append(visual, infoLink);
     grid.append(card);
   });
 }
@@ -1569,6 +1623,89 @@ if (configuration?.url && configuration?.anonKey) {
     showCatalogError("تعذّر تحميل قائمة المنتجات. تحققي من اتصالك وحاولي مرة أخرى.");
   }
 }
+```
+
+### `product-details.js`
+
+```javascript
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const moneyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "EGP",
+});
+const message = document.querySelector(".product-detail-message");
+const details = document.querySelector(".product-detail");
+
+function showMessage(text) {
+  message.textContent = text;
+  message.hidden = false;
+  details.hidden = true;
+}
+
+async function loadProduct() {
+  const productId = new URLSearchParams(window.location.search).get("id");
+  if (!productId) {
+    showMessage("This product could not be found.");
+    return;
+  }
+
+  const configuration = window.ZAIN_SUPABASE_CONFIG;
+  if (!configuration?.url || !configuration?.anonKey) {
+    showMessage("Product details are temporarily unavailable.");
+    console.error("Supabase is not configured for the product details page.");
+    return;
+  }
+
+  try {
+    const endpoint = new URL(configuration.url);
+    if (endpoint.protocol !== "https:" || !endpoint.hostname.endsWith(".supabase.co")) {
+      throw new Error("The published Supabase URL is invalid.");
+    }
+
+    const supabase = createClient(configuration.url, configuration.anonKey);
+    const { data: product, error } = await supabase
+      .from("products")
+      .select("id,name,description,price,category,image_url,stock")
+      .eq("id", productId)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!product) {
+      showMessage("This product is no longer available.");
+      return;
+    }
+
+    const visual = details.querySelector(".product-detail-visual");
+    if (product.image_url) {
+      const photo = document.createElement("img");
+      photo.className = "live-product-photo";
+      photo.src = product.image_url;
+      photo.alt = product.name;
+      photo.onerror = () => photo.remove();
+      visual.append(photo);
+    }
+
+    details.querySelector(".product-detail-category").textContent = product.category || "";
+    details.querySelector("h1").textContent = product.name;
+    details.querySelector(".product-detail-price").textContent = moneyFormatter.format(
+      Number(product.price) || 0,
+    );
+    details.querySelector(".product-detail-description").textContent = product.description || "";
+    details.querySelector(".product-detail-stock").textContent = Number(product.stock) < 1
+      ? "Currently out of stock"
+      : "In stock";
+    document.title = `${product.name} — ZAIN COSMETICS`;
+    message.hidden = true;
+    details.hidden = false;
+  } catch (error) {
+    console.error("Unable to retrieve product details.", error);
+    showMessage("Product details are temporarily unavailable. Please try again later.");
+  }
+}
+
+loadProduct();
 ```
 
 ### `styles.css`
@@ -1647,6 +1784,8 @@ h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
 .product-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 18px; }
 .product-image { position: relative; display: grid; height: clamp(220px, 28vw, 350px); place-items: center; overflow: hidden; }
 .product-image.product-image-live { background: linear-gradient(145deg,#eee7e0,#e5d8d0); }
+.product-image-link { position: absolute; z-index: 1; inset: 0; }
+.product-image-link:focus-visible, .product-info-link:focus-visible { outline: 2px solid var(--brand-purple); outline-offset: 3px; }
 .live-product-photo { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .product-image-live::before, .product-image-live::after { pointer-events: none; }
 .product-grid-live .swatches { display: none; }
@@ -1683,9 +1822,24 @@ h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
 .jar-body { display: flex; width: 118px; height: 97px; align-items: center; justify-content: center; flex-direction: column; border: 1px solid #e3ddd3; border-radius: 3px 3px 14px 14px; background: linear-gradient(90deg,#faf7f1,#ece5d8 60%,#f9f4eb); color: #706454; }
 .jar-body strong { margin: 8px 0 5px; font-size: 12px; }
 .product-info { display: flex; justify-content: space-between; gap: 7px; padding: 14px 1px 9px; font-size: 10px; }
+.product-info-link { display: block; color: inherit; text-decoration: none; }
 .product-info h3 { margin-bottom: 5px; font-size: 10px; font-weight: 600; }
 .product-info p { margin-bottom: 0; color: #8e837c; font-size: 9px; }
 .product-info > span { padding-top: 1px; font-size: 10px; }
+.product-detail-page { width: min(1080px, 90%); min-height: 60vh; margin: 50px auto 80px; }
+.product-detail-back { color: var(--ink); text-decoration: none; }
+.product-detail { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.85fr); align-items: center; gap: clamp(28px,7vw,90px); }
+.product-detail[hidden] { display: none; }
+.product-detail-visual { height: min(68vh,600px); min-height: 340px; }
+.product-detail-visual .live-product-photo { object-fit: contain; }
+.product-detail-info { padding: 20px 0; }
+.product-detail-category { margin-bottom: 14px; color: var(--brand-purple); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+.product-detail-info h1 { margin-bottom: 16px; font-family: var(--serif); font-size: clamp(32px,5vw,54px); font-weight: 400; line-height: 1.12; }
+.product-detail-price { margin-bottom: 22px; font-size: 17px; }
+.product-detail-description { color: #756c65; font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
+.product-detail-stock { margin-top: 24px; color: #756c65; font-size: 12px; }
+.product-detail-message { padding: 30px 20px; background: #f7f4f1; color: #756c65; font-size: 14px; text-align: center; }
+.product-detail-message[hidden] { display: none; }
 .swatches { display: flex; align-items: center; gap: 5px; color: #8e837c; font-size: 8px; }
 .swatches span { margin-left: 3px; }
 .swatch { width: 11px; height: 11px; border: 1px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1px #ded5ce; }
@@ -1805,6 +1959,10 @@ h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
   .hero-index { right: 6%; bottom: 2px; }
   .trust-strip { justify-content: flex-start; padding: 17px 7%; font-size: 8px; }
   .shop-section { padding: 66px 5% 73px; }
+  .product-detail-page { margin-top: 25px; }
+  .product-detail { grid-template-columns: 1fr; gap: 20px; }
+  .product-detail-visual { height: 75vw; min-height: 260px; max-height: 450px; }
+  .product-detail-info { padding: 0 2px; }
   .section-heading { align-items: flex-start; gap: 15px; flex-direction: column; margin-bottom: 26px; }
   .section-heading h2 { font-size: 43px; }
   .product-grid { gap: 25px 11px; }

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#6f45cf" />
+    <meta name="description" content="Product details — ZAIN COSMETICS." />
+    <title>Product details — ZAIN COSMETICS</title>
+    <link rel="icon" type="image/png" href="assets/zain-cosmetics-favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand-link" href="./" aria-label="ZAIN COSMETICS home">
+        <img class="brand-logo" src="assets/zain-cosmetics-logo.png" alt="ZAIN COSMETICS" />
+      </a>
+      <a class="text-link product-detail-back" href="./#shop">Back to shop <span aria-hidden="true">→</span></a>
+    </header>
+    <main class="product-detail-page">
+      <p class="product-detail-message" role="status" aria-live="polite">Loading product details…</p>
+      <article class="product-detail" hidden>
+        <div class="product-image product-image-live product-detail-visual"></div>
+        <div class="product-detail-info">
+          <p class="product-detail-category"></p>
+          <h1></h1>
+          <p class="product-detail-price"></p>
+          <p class="product-detail-description"></p>
+          <p class="product-detail-stock"></p>
+        </div>
+      </article>
+    </main>
+    <script src="supabase-config.js?v=egp-currency-20261009"></script>
+    <script type="module" src="product-details.js?v=product-page-20261009"></script>
+  </body>
+</html>

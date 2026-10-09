@@ -52,14 +52,18 @@ function renderProducts(products) {
     const card = createElement("article", "product-card");
     card.dataset.category = product.category.trim();
     const visual = createElement("div", "product-image product-image-live");
+    const imageLink = createElement("a", "product-image-link");
+    imageLink.href = `product.html?id=${encodeURIComponent(product.id)}`;
+    imageLink.setAttribute("aria-label", `View ${product.name}`);
     if (product.image_url) {
       const photo = createElement("img", "live-product-photo");
       photo.src = product.image_url;
       photo.alt = product.name;
       photo.loading = "lazy";
       photo.onerror = () => photo.remove();
-      visual.append(photo);
+      imageLink.append(photo);
     }
+    visual.append(imageLink);
 
     if (Number(product.stock) < 1) {
       visual.append(createElement("span", "product-tag", "Sold out"));
@@ -80,6 +84,9 @@ function renderProducts(products) {
     );
     visual.append(add);
 
+    const infoLink = createElement("a", "product-info-link");
+    infoLink.href = imageLink.href;
+    infoLink.setAttribute("aria-label", `View ${product.name}`);
     const info = createElement("div", "product-info");
     const details = document.createElement("div");
     details.append(
@@ -87,7 +94,8 @@ function renderProducts(products) {
       createElement("p", "", product.description || product.category),
     );
     info.append(details, createElement("span", "", formatMoney(product.price)));
-    card.append(visual, info);
+    infoLink.append(info);
+    card.append(visual, infoLink);
     grid.append(card);
   });
 }
