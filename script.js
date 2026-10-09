@@ -1,3 +1,5 @@
+import { addCartItem, loadCart, saveCart } from "./cart-storage.js";
+
 const bagCount = document.querySelector(".bag-count");
 const bagButton = document.querySelector(".bag-button");
 const toast = document.querySelector(".toast");
@@ -10,7 +12,7 @@ const cartShipping = document.querySelector(".cart-shipping");
 const cartShippingNote = document.querySelector(".cart-shipping-note");
 const cartItemCount = document.querySelector(".cart-item-count");
 const checkoutButton = document.querySelector(".checkout-button");
-const cart = new Map();
+const cart = loadCart();
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "EGP",
@@ -30,6 +32,7 @@ function showToast(message) {
 }
 
 function renderCart() {
+  saveCart(cart);
   const items = Array.from(cart.values());
   const quantity = items.reduce((total, item) => total + item.quantity, 0);
   const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -107,19 +110,19 @@ document.querySelector(".product-grid")?.addEventListener("click", (event) => {
   const button = event.target.closest(".quick-add");
   if (!button) return;
 
-  const id = button.dataset.productId || button.dataset.product;
-  const name = button.dataset.product;
-  const price = Number(button.dataset.price);
-  const maxStock = button.dataset.stock ? Number(button.dataset.stock) : Number.POSITIVE_INFINITY;
-  const item = cart.get(id);
-  if (item && item.quantity >= maxStock) {
-    showToast(`Only ${maxStock} ${maxStock === 1 ? "item is" : "items are"} available`);
+  const added = addCartItem(cart, {
+    id: button.dataset.productId || button.dataset.product,
+    name: button.dataset.product,
+    price: Number(button.dataset.price),
+    stock: Number(button.dataset.stock),
+  });
+  if (!added) {
+    showToast("This product is currently unavailable");
     return;
   }
 
-  cart.set(id, { id, name, price, maxStock, quantity: (item?.quantity ?? 0) + 1 });
   renderCart();
-  showToast(`${name} added to your bag`);
+  showToast(`${button.dataset.product} added to your bag`);
 });
 
 bagButton.addEventListener("click", openCart);
@@ -162,3 +165,6 @@ document.querySelector(".newsletter-form").addEventListener("submit", (event) =>
 });
 
 renderCart();
+if (new URLSearchParams(window.location.search).get("open-cart") === "1" && cart.size) {
+  openCart();
+}

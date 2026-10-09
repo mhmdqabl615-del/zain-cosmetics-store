@@ -11,7 +11,7 @@
 ## ????? ??????
 
 - `index.html`, `styles.css`, `script.js`: ????? ?????? ??????? ???? ???????? ?????? ?????? ?? Supabase.
-- `storefront-catalog.js`, `product.html`, `product-details.js`, `supabase-config.js`: ????? ???????? ??????? ??????? ??? ???????? ?????? ??????? ?????.
+- `storefront-catalog.js`, `product.html`, `product-details.js`, `cart-storage.js`, `supabase-config.js`: ????? ???????? ??????? ??????? ??? ???????? ?????? ??????? ?????.
 - `admin.html`, `admin.css`, `admin.js`: ???? ?????? ?????? ???????? ???????? ???????? ???????? ?????? ?????? ???????? ???? ??????.
 - `supabase/setup.sql`: ????? ?????? ??????? Row Level Security (RLS) ???????? ???? ??????. ??????? ?????? ????? ?????? ?????? ??? ????? ????? ????? ????????.
 - `.github/workflows/deploy-pages.yml`: ??? GitHub Pages ???????? ??? ??????? ??? ????? `main`.
@@ -1214,7 +1214,7 @@ await initialize();
     </aside>
     <div class="toast" role="status" aria-live="polite"></div>
     <script src="supabase-config.js?v=catalog-sections-20261008"></script>
-    <script src="script.js?v=egp-currency-20261009"></script>
+    <script type="module" src="script.js?v=product-bag-20261009"></script>
     <script type="module" src="storefront-catalog.js?v=product-page-20261009"></script>
   </body>
 </html>
@@ -1245,7 +1245,9 @@ await initialize();
       <a class="brand-link" href="./" aria-label="ZAIN COSMETICS home">
         <img class="brand-logo" src="assets/zain-cosmetics-logo.png" alt="ZAIN COSMETICS" />
       </a>
-      <a class="text-link product-detail-back" href="./#shop">Back to shop <span aria-hidden="true">→</span></a>
+      <a class="bag-button product-detail-bag" href="./?open-cart=1" aria-label="Shopping bag, 0 items">
+        Bag <span class="bag-count">0</span>
+      </a>
     </header>
     <main class="product-detail-page">
       <p class="product-detail-message" role="status" aria-live="polite">Loading product details…</p>
@@ -1257,11 +1259,13 @@ await initialize();
           <p class="product-detail-price"></p>
           <p class="product-detail-description"></p>
           <p class="product-detail-stock"></p>
+          <button class="button button-dark product-detail-add" type="button" disabled>Add to bag</button>
+          <p class="product-detail-cart-status" role="status" aria-live="polite"></p>
         </div>
       </article>
     </main>
     <script src="supabase-config.js?v=egp-currency-20261009"></script>
-    <script type="module" src="product-details.js?v=product-page-20261009"></script>
+    <script type="module" src="product-details.js?v=product-bag-20261009"></script>
   </body>
 </html>
 ```
@@ -1269,6 +1273,8 @@ await initialize();
 ### `script.js`
 
 ```javascript
+import { addCartItem, loadCart, saveCart } from "./cart-storage.js";
+
 const bagCount = document.querySelector(".bag-count");
 const bagButton = document.querySelector(".bag-button");
 const toast = document.querySelector(".toast");
@@ -1281,7 +1287,7 @@ const cartShipping = document.querySelector(".cart-shipping");
 const cartShippingNote = document.querySelector(".cart-shipping-note");
 const cartItemCount = document.querySelector(".cart-item-count");
 const checkoutButton = document.querySelector(".checkout-button");
-const cart = new Map();
+const cart = loadCart();
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "EGP",
@@ -1301,6 +1307,7 @@ function showToast(message) {
 }
 
 function renderCart() {
+  saveCart(cart);
   const items = Array.from(cart.values());
   const quantity = items.reduce((total, item) => total + item.quantity, 0);
   const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -1378,19 +1385,19 @@ document.querySelector(".product-grid")?.addEventListener("click", (event) => {
   const button = event.target.closest(".quick-add");
   if (!button) return;
 
-  const id = button.dataset.productId || button.dataset.product;
-  const name = button.dataset.product;
-  const price = Number(button.dataset.price);
-  const maxStock = button.dataset.stock ? Number(button.dataset.stock) : Number.POSITIVE_INFINITY;
-  const item = cart.get(id);
-  if (item && item.quantity >= maxStock) {
-    showToast(`Only ${maxStock} ${maxStock === 1 ? "item is" : "items are"} available`);
+  const added = addCartItem(cart, {
+    id: button.dataset.productId || button.dataset.product,
+    name: button.dataset.product,
+    price: Number(button.dataset.price),
+    stock: Number(button.dataset.stock),
+  });
+  if (!added) {
+    showToast("This product is currently unavailable");
     return;
   }
 
-  cart.set(id, { id, name, price, maxStock, quantity: (item?.quantity ?? 0) + 1 });
   renderCart();
-  showToast(`${name} added to your bag`);
+  showToast(`${button.dataset.product} added to your bag`);
 });
 
 bagButton.addEventListener("click", openCart);
@@ -1433,6 +1440,75 @@ document.querySelector(".newsletter-form").addEventListener("submit", (event) =>
 });
 
 renderCart();
+if (new URLSearchParams(window.location.search).get("open-cart") === "1" && cart.size) {
+  openCart();
+}
+```
+
+### `cart-storage.js`
+
+```javascript
+export const cartStorageKey = "zain-store-cart";
+
+export function loadCart() {
+  try {
+    const storedItems = JSON.parse(localStorage.getItem(cartStorageKey) || "[]");
+    if (!Array.isArray(storedItems)) {
+      throw new TypeError("Saved cart data is not a list.");
+    }
+
+    const items = new Map();
+    storedItems.forEach((item) => {
+      if (
+        !item ||
+        typeof item.id !== "string" ||
+        !item.id ||
+        typeof item.name !== "string" ||
+        !Number.isFinite(item.price) ||
+        item.price < 0 ||
+        !Number.isSafeInteger(item.maxStock) ||
+        item.maxStock < 0 ||
+        !Number.isSafeInteger(item.quantity) ||
+        item.quantity < 1 ||
+        item.quantity > item.maxStock
+      ) {
+        console.warn("Ignoring invalid saved cart item.", item);
+        return;
+      }
+
+      items.set(item.id, item);
+    });
+    return items;
+  } catch (error) {
+    console.error("Unable to restore the saved shopping bag.", error);
+    return new Map();
+  }
+}
+
+export function saveCart(cart) {
+  try {
+    localStorage.setItem(cartStorageKey, JSON.stringify(Array.from(cart.values())));
+  } catch (error) {
+    console.error("Unable to save the shopping bag.", error);
+  }
+}
+
+export function addCartItem(cart, product) {
+  const stock = Number(product.stock);
+  const item = cart.get(product.id);
+  if (!Number.isSafeInteger(stock) || stock < 1 || (item && item.quantity >= stock)) {
+    return false;
+  }
+
+  cart.set(product.id, {
+    id: product.id,
+    name: product.name,
+    price: Number(product.price),
+    maxStock: stock,
+    quantity: (item?.quantity ?? 0) + 1,
+  });
+  return true;
+}
 ```
 
 ### `SETUP-OWNER.md`
@@ -1629,6 +1705,7 @@ if (configuration?.url && configuration?.anonKey) {
 
 ```javascript
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { addCartItem, loadCart, saveCart } from "./cart-storage.js";
 
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -1636,6 +1713,21 @@ const moneyFormatter = new Intl.NumberFormat("en-US", {
 });
 const message = document.querySelector(".product-detail-message");
 const details = document.querySelector(".product-detail");
+const bagCount = document.querySelector(".product-detail-bag .bag-count");
+const bagButton = document.querySelector(".product-detail-bag");
+const addButton = document.querySelector(".product-detail-add");
+const cartStatus = document.querySelector(".product-detail-cart-status");
+let cart = loadCart();
+let product;
+
+function updateBagCount() {
+  const quantity = Array.from(cart.values()).reduce((total, item) => total + item.quantity, 0);
+  bagCount.textContent = String(quantity);
+  bagButton.setAttribute(
+    "aria-label",
+    `Shopping bag, ${quantity} ${quantity === 1 ? "item" : "items"}`,
+  );
+}
 
 function showMessage(text) {
   message.textContent = text;
@@ -1664,7 +1756,7 @@ async function loadProduct() {
     }
 
     const supabase = createClient(configuration.url, configuration.anonKey);
-    const { data: product, error } = await supabase
+    const { data, error } = await supabase
       .from("products")
       .select("id,name,description,price,category,image_url,stock")
       .eq("id", productId)
@@ -1672,10 +1764,11 @@ async function loadProduct() {
       .maybeSingle();
 
     if (error) throw error;
-    if (!product) {
+    if (!data) {
       showMessage("This product is no longer available.");
       return;
     }
+    product = data;
 
     const visual = details.querySelector(".product-detail-visual");
     if (product.image_url) {
@@ -1696,14 +1789,34 @@ async function loadProduct() {
     details.querySelector(".product-detail-stock").textContent = Number(product.stock) < 1
       ? "Currently out of stock"
       : "In stock";
+    addButton.disabled = Number(product.stock) < 1;
+    addButton.textContent = Number(product.stock) < 1 ? "Out of stock" : "Add to bag";
     document.title = `${product.name} — ZAIN COSMETICS`;
     message.hidden = true;
     details.hidden = false;
+    updateBagCount();
   } catch (error) {
     console.error("Unable to retrieve product details.", error);
     showMessage("Product details are temporarily unavailable. Please try again later.");
   }
 }
+
+addButton.addEventListener("click", () => {
+  if (!product || !addCartItem(cart, product)) {
+    cartStatus.textContent = "This product is currently unavailable.";
+    addButton.disabled = true;
+    return;
+  }
+
+  saveCart(cart);
+  updateBagCount();
+  cartStatus.textContent = `${product.name} added to your bag.`;
+});
+
+window.addEventListener("pageshow", () => {
+  cart = loadCart();
+  updateBagCount();
+});
 
 loadProduct();
 ```
@@ -1838,6 +1951,9 @@ h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
 .product-detail-price { margin-bottom: 22px; font-size: 17px; }
 .product-detail-description { color: #756c65; font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
 .product-detail-stock { margin-top: 24px; color: #756c65; font-size: 12px; }
+.product-detail-add { margin-top: 14px; border: 0; cursor: pointer; }
+.product-detail-add:disabled { background: #aaa19a; cursor: not-allowed; }
+.product-detail-cart-status { min-height: 18px; margin: 12px 0 0; color: #58762b; font-size: 12px; }
 .product-detail-message { padding: 30px 20px; background: #f7f4f1; color: #756c65; font-size: 14px; text-align: center; }
 .product-detail-message[hidden] { display: none; }
 .swatches { display: flex; align-items: center; gap: 5px; color: #8e837c; font-size: 8px; }

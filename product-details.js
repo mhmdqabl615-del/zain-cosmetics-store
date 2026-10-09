@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { addCartItem, loadCart, saveCart } from "./cart-storage.js";
 
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -6,6 +7,21 @@ const moneyFormatter = new Intl.NumberFormat("en-US", {
 });
 const message = document.querySelector(".product-detail-message");
 const details = document.querySelector(".product-detail");
+const bagCount = document.querySelector(".product-detail-bag .bag-count");
+const bagButton = document.querySelector(".product-detail-bag");
+const addButton = document.querySelector(".product-detail-add");
+const cartStatus = document.querySelector(".product-detail-cart-status");
+let cart = loadCart();
+let product;
+
+function updateBagCount() {
+  const quantity = Array.from(cart.values()).reduce((total, item) => total + item.quantity, 0);
+  bagCount.textContent = String(quantity);
+  bagButton.setAttribute(
+    "aria-label",
+    `Shopping bag, ${quantity} ${quantity === 1 ? "item" : "items"}`,
+  );
+}
 
 function showMessage(text) {
   message.textContent = text;
@@ -34,7 +50,7 @@ async function loadProduct() {
     }
 
     const supabase = createClient(configuration.url, configuration.anonKey);
-    const { data: product, error } = await supabase
+    const { data, error } = await supabase
       .from("products")
       .select("id,name,description,price,category,image_url,stock")
       .eq("id", productId)
@@ -42,10 +58,11 @@ async function loadProduct() {
       .maybeSingle();
 
     if (error) throw error;
-    if (!product) {
+    if (!data) {
       showMessage("This product is no longer available.");
       return;
     }
+    product = data;
 
     const visual = details.querySelector(".product-detail-visual");
     if (product.image_url) {
@@ -66,13 +83,33 @@ async function loadProduct() {
     details.querySelector(".product-detail-stock").textContent = Number(product.stock) < 1
       ? "Currently out of stock"
       : "In stock";
+    addButton.disabled = Number(product.stock) < 1;
+    addButton.textContent = Number(product.stock) < 1 ? "Out of stock" : "Add to bag";
     document.title = `${product.name} — ZAIN COSMETICS`;
     message.hidden = true;
     details.hidden = false;
+    updateBagCount();
   } catch (error) {
     console.error("Unable to retrieve product details.", error);
     showMessage("Product details are temporarily unavailable. Please try again later.");
   }
 }
+
+addButton.addEventListener("click", () => {
+  if (!product || !addCartItem(cart, product)) {
+    cartStatus.textContent = "This product is currently unavailable.";
+    addButton.disabled = true;
+    return;
+  }
+
+  saveCart(cart);
+  updateBagCount();
+  cartStatus.textContent = `${product.name} added to your bag.`;
+});
+
+window.addEventListener("pageshow", () => {
+  cart = loadCart();
+  updateBagCount();
+});
 
 loadProduct();

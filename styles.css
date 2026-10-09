@@ -125,6 +125,9 @@ h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
 .product-detail-price { margin-bottom: 22px; font-size: 17px; }
 .product-detail-description { color: #756c65; font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
 .product-detail-stock { margin-top: 24px; color: #756c65; font-size: 12px; }
+.product-detail-add { margin-top: 14px; border: 0; cursor: pointer; }
+.product-detail-add:disabled { background: #aaa19a; cursor: not-allowed; }
+.product-detail-cart-status { min-height: 18px; margin: 12px 0 0; color: #58762b; font-size: 12px; }
 .product-detail-message { padding: 30px 20px; background: #f7f4f1; color: #756c65; font-size: 14px; text-align: center; }
 .product-detail-message[hidden] { display: none; }
 .swatches { display: flex; align-items: center; gap: 5px; color: #8e837c; font-size: 8px; }

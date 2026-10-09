@@ -20,7 +20,9 @@
       <a class="brand-link" href="./" aria-label="ZAIN COSMETICS home">
         <img class="brand-logo" src="assets/zain-cosmetics-logo.png" alt="ZAIN COSMETICS" />
       </a>
-      <a class="text-link product-detail-back" href="./#shop">Back to shop <span aria-hidden="true">→</span></a>
+      <a class="bag-button product-detail-bag" href="./?open-cart=1" aria-label="Shopping bag, 0 items">
+        Bag <span class="bag-count">0</span>
+      </a>
     </header>
     <main class="product-detail-page">
       <p class="product-detail-message" role="status" aria-live="polite">Loading product details…</p>
@@ -32,10 +34,12 @@
           <p class="product-detail-price"></p>
           <p class="product-detail-description"></p>
           <p class="product-detail-stock"></p>
+          <button class="button button-dark product-detail-add" type="button" disabled>Add to bag</button>
+          <p class="product-detail-cart-status" role="status" aria-live="polite"></p>
         </div>
       </article>
     </main>
     <script src="supabase-config.js?v=egp-currency-20261009"></script>
-    <script type="module" src="product-details.js?v=product-page-20261009"></script>
+    <script type="module" src="product-details.js?v=product-bag-20261009"></script>
   </body>
 </html>
