@@ -1108,7 +1108,12 @@ await initialize();
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="announcement">A little love for your skin — free shipping over EGP 50</div>
+    <div class="announcement" aria-label="A little love for your skin — free shipping over EGP 50">
+      <div class="announcement-track">
+        <span>A little love for your skin — free shipping over EGP 50</span>
+        <span aria-hidden="true">A little love for your skin — free shipping over EGP 50</span>
+      </div>
+    </div>
 
     <header class="site-header">
       <a class="brand-link" href="#" aria-label="ZAIN COSMETICS home">
@@ -1844,7 +1849,10 @@ body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(
 a { color: inherit; text-decoration: none; }
 button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
-.announcement { min-height: 32px; display: grid; place-items: center; padding: 7px 16px; background: var(--brand-purple); color: #fffaf5; text-align: center; font-size: 10px; letter-spacing: .09em; }
+.announcement { min-height: 32px; overflow: hidden; background: var(--brand-purple); color: #fffaf5; font-size: 10px; letter-spacing: .09em; white-space: nowrap; }
+.announcement-track { display: flex; width: max-content; animation: announcement-scroll 24s linear infinite; }
+.announcement-track span { flex: 0 0 auto; padding: 9px 6vw; }
+@keyframes announcement-scroll { to { transform: translateX(-50%); } }
 .site-header { height: 76px; padding: 0 7.2%; display: flex; align-items: center; justify-content: space-between; background: var(--paper); }
 .brand-link { display: flex; width: 145px; height: 70px; flex-shrink: 0; align-items: center; justify-content: center; overflow: hidden; padding: 2px 8px; background: var(--brand-purple); }
 .brand-logo { display: block; width: 100%; height: 100%; object-fit: contain; }
@@ -2107,6 +2115,7 @@ h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
   .cart-drawer { padding: 24px 20px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .announcement-track { animation: none; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
 ```
