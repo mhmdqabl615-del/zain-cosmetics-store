@@ -1108,11 +1108,11 @@ await initialize();
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="announcement" aria-label="A little love for your skin — free shipping over EGP 50">
+    <div class="announcement" aria-label="A little love for your skin — free shipping over EGP 1,500">
       <div class="announcement-track">
-        <span>A little love for your skin — free shipping over EGP 50</span>
-        <span aria-hidden="true">A little love for your skin — free shipping over EGP 50</span>
-        <span aria-hidden="true">A little love for your skin — free shipping over EGP 50</span>
+        <span>A little love for your skin — free shipping over EGP 1,500</span>
+        <span aria-hidden="true">A little love for your skin — free shipping over EGP 1,500</span>
+        <span aria-hidden="true">A little love for your skin — free shipping over EGP 1,500</span>
       </div>
     </div>
 
@@ -1298,7 +1298,7 @@ const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "EGP",
 });
-const freeShippingThreshold = 50;
+const freeShippingThreshold = 1500;
 let toastTimer;
 
 function formatMoney(value) {

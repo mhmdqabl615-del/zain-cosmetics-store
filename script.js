@@ -17,7 +17,7 @@ const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "EGP",
 });
-const freeShippingThreshold = 50;
+const freeShippingThreshold = 1500;
 let toastTimer;
 
 function formatMoney(value) {
