@@ -1105,7 +1105,7 @@ await initialize();
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=slower-hero-word-reveal-20261009" />
+    <link rel="stylesheet" href="styles.css?v=hero-brand-lime-20261009" />
   </head>
   <body>
     <div class="announcement" aria-label="A little love for your skin — free shipping over EGP 1,500">
@@ -1879,6 +1879,7 @@ h1 { margin: 0; font-size: clamp(50px, 6vw, 79px); line-height: 1.06; }
 .hero-word-6 { animation-delay: 1.4s; }
 @keyframes hero-word-reveal { to { opacity: 1; transform: translateY(0); } }
 h1 em, h2 em { color: #b78376; font-weight: 400; }
+.hero h1 em { color: var(--brand-lime); }
 .hero-description { max-width: 370px; margin: 22px 0 25px; color: var(--muted); font-size: 12px; line-height: 1.9; }
 .button { display: inline-flex; align-items: center; justify-content: space-between; gap: 28px; min-height: 47px; padding: 0 20px; font-size: 10px; transition: background .2s, transform .2s; }
 .button:hover { transform: translateY(-2px); }

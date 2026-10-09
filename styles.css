@@ -47,6 +47,7 @@ h1 { margin: 0; font-size: clamp(50px, 6vw, 79px); line-height: 1.06; }
 .hero-word-6 { animation-delay: 1.4s; }
 @keyframes hero-word-reveal { to { opacity: 1; transform: translateY(0); } }
 h1 em, h2 em { color: #b78376; font-weight: 400; }
+.hero h1 em { color: var(--brand-lime); }
 .hero-description { max-width: 370px; margin: 22px 0 25px; color: var(--muted); font-size: 12px; line-height: 1.9; }
 .button { display: inline-flex; align-items: center; justify-content: space-between; gap: 28px; min-height: 47px; padding: 0 20px; font-size: 10px; transition: background .2s, transform .2s; }
 .button:hover { transform: translateY(-2px); }
