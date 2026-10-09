@@ -1220,7 +1220,7 @@ await initialize();
     </aside>
     <div class="toast" role="status" aria-live="polite"></div>
     <script src="supabase-config.js?v=catalog-sections-20261008"></script>
-    <script type="module" src="script.js?v=product-bag-20261009"></script>
+    <script type="module" src="script.js?v=free-shipping-1500-20261009"></script>
     <script type="module" src="storefront-catalog.js?v=product-page-20261009"></script>
   </body>
 </html>
