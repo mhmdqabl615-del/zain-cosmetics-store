@@ -15,7 +15,7 @@
     />
     <link rel="stylesheet" href="admin.css" />
     <script src="supabase-config.js"></script>
-    <script type="module" src="admin.js?v=recovery-fix-2"></script>
+    <script type="module" src="admin.js?v=egp-currency-20261009"></script>
   </head>
   <body>
     <main class="admin-main">
@@ -94,7 +94,7 @@
                 <article class="stat-card"><span>كل المنتجات</span><strong id="stats-products">—</strong><small>منتج في مخزونك</small></article>
                 <article class="stat-card"><span>منتجات ظاهرة للزوار</span><strong id="stats-active">—</strong><small>منتج متاح في المتجر</small></article>
                 <article class="stat-card"><span>طلبات تحتاج متابعة</span><strong id="stats-pending">—</strong><small>طلب بانتظار التأكيد</small></article>
-                <article class="stat-card"><span>إجمالي المبيعات المسجلة</span><strong id="stats-revenue">$0.00</strong><small>باستثناء الطلبات الملغاة</small></article>
+                <article class="stat-card"><span>إجمالي المبيعات المسجلة</span><strong id="stats-revenue">EGP 0.00</strong><small>باستثناء الطلبات الملغاة</small></article>
               </div>
               <div class="recent-panel"><div class="section-bar"><div><p class="eyebrow">آخر ما تم تسجيله</p><h2>أحدث الطلبات</h2></div><button class="text-button" type="button" data-go-view="orders">عرض كل الطلبات ←</button></div><div class="table-wrap"><table><thead><tr><th>رقم الطلب</th><th>العميل</th><th>التفاصيل</th><th>الإجمالي</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody id="recent-orders"></tbody></table></div><p class="empty-state" id="recent-empty" hidden>لم تُسجل أي طلبات بعد.</p></div>
             </section>
@@ -126,7 +126,7 @@
         <label for="product-name">اسم المنتج</label><input id="product-name" name="name" maxlength="120" required />
         <label for="product-category">القسم</label><input id="product-category" name="category" list="product-categories" maxlength="60" placeholder="مثل: العناية بالبشرة أو المكياج" required /><datalist id="product-categories"></datalist>
         <label for="product-description">وصف المنتج</label><textarea id="product-description" name="description" maxlength="1000" rows="3"></textarea>
-        <div class="field-pair"><div><label for="product-price">السعر (USD)</label><input id="product-price" name="price" type="number" min="0" step="0.01" required /></div><div><label for="product-stock">الكمية المتوفرة</label><input id="product-stock" name="stock" type="number" min="0" step="1" required /></div></div>
+        <div class="field-pair"><div><label for="product-price">السعر (EGP)</label><input id="product-price" name="price" type="number" min="0" step="0.01" required /></div><div><label for="product-stock">الكمية المتوفرة</label><input id="product-stock" name="stock" type="number" min="0" step="1" required /></div></div>
         <label for="product-image">رابط صورة المنتج (اختياري)</label><input id="product-image" name="image_url" type="url" inputmode="url" placeholder="https://..." />
         <label class="checkbox-field"><input name="featured" type="checkbox" /> اختاري كمنتج مميز</label>
         <label class="checkbox-field"><input name="is_active" type="checkbox" checked /> إظهار المنتج في المتجر</label>
@@ -141,8 +141,8 @@
         <label for="order-customer">اسم العميل</label><input id="order-customer" name="customer_name" maxlength="120" autocomplete="name" required />
         <label for="order-phone">رقم التواصل</label><input id="order-phone" name="customer_phone" type="tel" maxlength="40" autocomplete="tel" required />
         <label for="order-item">المنتج أو تفاصيل الطلب</label><input id="order-item" name="item_name" maxlength="120" required />
-        <div class="field-pair"><div><label for="order-quantity">الكمية</label><input id="order-quantity" name="quantity" type="number" min="1" step="1" value="1" required /></div><div><label for="order-unit-price">سعر القطعة (USD)</label><input id="order-unit-price" name="unit_price" type="number" min="0" step="0.01" required /></div></div>
-        <p class="order-total-preview">إجمالي الطلب: <strong id="order-total-preview">$0.00</strong></p>
+        <div class="field-pair"><div><label for="order-quantity">الكمية</label><input id="order-quantity" name="quantity" type="number" min="1" step="1" value="1" required /></div><div><label for="order-unit-price">سعر القطعة (EGP)</label><input id="order-unit-price" name="unit_price" type="number" min="0" step="0.01" required /></div></div>
+        <p class="order-total-preview">إجمالي الطلب: <strong id="order-total-preview">EGP 0.00</strong></p>
         <label for="order-notes">ملاحظات خاصة (اختياري)</label><textarea id="order-notes" name="notes" maxlength="1000" rows="3"></textarea>
         <p class="privacy-note">بيانات العملاء محفوظة في قاعدة بيانات متجرك الخاصة، ولا يطّلع عليها الزوار.</p>
         <p class="form-error" id="order-error" role="alert"></p>

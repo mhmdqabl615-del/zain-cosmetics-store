@@ -11,8 +11,16 @@ const cartShippingNote = document.querySelector(".cart-shipping-note");
 const cartItemCount = document.querySelector(".cart-item-count");
 const checkoutButton = document.querySelector(".checkout-button");
 const cart = new Map();
+const moneyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "EGP",
+});
 const freeShippingThreshold = 50;
 let toastTimer;
+
+function formatMoney(value) {
+  return moneyFormatter.format(Number(value) || 0);
+}
 
 function showToast(message) {
   toast.textContent = message;
@@ -33,11 +41,11 @@ function renderCart() {
   cartItems.replaceChildren();
   cartEmpty.hidden = items.length > 0;
   checkoutButton.disabled = items.length === 0;
-  cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
-  cartShipping.textContent = shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`;
+  cartSubtotal.textContent = formatMoney(subtotal);
+  cartShipping.textContent = shipping === 0 ? "Free" : formatMoney(shipping);
   cartShippingNote.textContent = subtotal >= freeShippingThreshold
     ? "Lovely — your order ships free!"
-    : `You're $${(freeShippingThreshold - subtotal).toFixed(2)} away from free shipping.`;
+    : `You're ${formatMoney(freeShippingThreshold - subtotal)} away from free shipping.`;
 
   items.forEach((item) => {
     const row = document.createElement("li");
@@ -48,7 +56,7 @@ function renderCart() {
     const name = document.createElement("strong");
     name.textContent = item.name;
     const price = document.createElement("span");
-    price.textContent = `$${item.price.toFixed(2)}`;
+    price.textContent = formatMoney(item.price);
     details.append(name, price);
 
     const controls = document.createElement("div");

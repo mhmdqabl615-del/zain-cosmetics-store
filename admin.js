@@ -14,7 +14,7 @@ const orderForm = document.querySelector("#order-form");
 const editorStorageKey = "zain-admin-supabase-config";
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "USD",
+  currency: "EGP",
 });
 const statusLabels = {
   pending: "بانتظار التأكيد",

@@ -254,7 +254,7 @@ td { padding: 13px 11px; border-top: 1px solid #eee9e4; color: #4f4945; font-siz
     />
     <link rel="stylesheet" href="admin.css" />
     <script src="supabase-config.js"></script>
-    <script type="module" src="admin.js?v=recovery-fix-2"></script>
+    <script type="module" src="admin.js?v=egp-currency-20261009"></script>
   </head>
   <body>
     <main class="admin-main">
@@ -333,7 +333,7 @@ td { padding: 13px 11px; border-top: 1px solid #eee9e4; color: #4f4945; font-siz
                 <article class="stat-card"><span>كل المنتجات</span><strong id="stats-products">—</strong><small>منتج في مخزونك</small></article>
                 <article class="stat-card"><span>منتجات ظاهرة للزوار</span><strong id="stats-active">—</strong><small>منتج متاح في المتجر</small></article>
                 <article class="stat-card"><span>طلبات تحتاج متابعة</span><strong id="stats-pending">—</strong><small>طلب بانتظار التأكيد</small></article>
-                <article class="stat-card"><span>إجمالي المبيعات المسجلة</span><strong id="stats-revenue">$0.00</strong><small>باستثناء الطلبات الملغاة</small></article>
+                <article class="stat-card"><span>إجمالي المبيعات المسجلة</span><strong id="stats-revenue">EGP 0.00</strong><small>باستثناء الطلبات الملغاة</small></article>
               </div>
               <div class="recent-panel"><div class="section-bar"><div><p class="eyebrow">آخر ما تم تسجيله</p><h2>أحدث الطلبات</h2></div><button class="text-button" type="button" data-go-view="orders">عرض كل الطلبات ←</button></div><div class="table-wrap"><table><thead><tr><th>رقم الطلب</th><th>العميل</th><th>التفاصيل</th><th>الإجمالي</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody id="recent-orders"></tbody></table></div><p class="empty-state" id="recent-empty" hidden>لم تُسجل أي طلبات بعد.</p></div>
             </section>
@@ -365,7 +365,7 @@ td { padding: 13px 11px; border-top: 1px solid #eee9e4; color: #4f4945; font-siz
         <label for="product-name">اسم المنتج</label><input id="product-name" name="name" maxlength="120" required />
         <label for="product-category">القسم</label><input id="product-category" name="category" list="product-categories" maxlength="60" placeholder="مثل: العناية بالبشرة أو المكياج" required /><datalist id="product-categories"></datalist>
         <label for="product-description">وصف المنتج</label><textarea id="product-description" name="description" maxlength="1000" rows="3"></textarea>
-        <div class="field-pair"><div><label for="product-price">السعر (USD)</label><input id="product-price" name="price" type="number" min="0" step="0.01" required /></div><div><label for="product-stock">الكمية المتوفرة</label><input id="product-stock" name="stock" type="number" min="0" step="1" required /></div></div>
+        <div class="field-pair"><div><label for="product-price">السعر (EGP)</label><input id="product-price" name="price" type="number" min="0" step="0.01" required /></div><div><label for="product-stock">الكمية المتوفرة</label><input id="product-stock" name="stock" type="number" min="0" step="1" required /></div></div>
         <label for="product-image">رابط صورة المنتج (اختياري)</label><input id="product-image" name="image_url" type="url" inputmode="url" placeholder="https://..." />
         <label class="checkbox-field"><input name="featured" type="checkbox" /> اختاري كمنتج مميز</label>
         <label class="checkbox-field"><input name="is_active" type="checkbox" checked /> إظهار المنتج في المتجر</label>
@@ -380,8 +380,8 @@ td { padding: 13px 11px; border-top: 1px solid #eee9e4; color: #4f4945; font-siz
         <label for="order-customer">اسم العميل</label><input id="order-customer" name="customer_name" maxlength="120" autocomplete="name" required />
         <label for="order-phone">رقم التواصل</label><input id="order-phone" name="customer_phone" type="tel" maxlength="40" autocomplete="tel" required />
         <label for="order-item">المنتج أو تفاصيل الطلب</label><input id="order-item" name="item_name" maxlength="120" required />
-        <div class="field-pair"><div><label for="order-quantity">الكمية</label><input id="order-quantity" name="quantity" type="number" min="1" step="1" value="1" required /></div><div><label for="order-unit-price">سعر القطعة (USD)</label><input id="order-unit-price" name="unit_price" type="number" min="0" step="0.01" required /></div></div>
-        <p class="order-total-preview">إجمالي الطلب: <strong id="order-total-preview">$0.00</strong></p>
+        <div class="field-pair"><div><label for="order-quantity">الكمية</label><input id="order-quantity" name="quantity" type="number" min="1" step="1" value="1" required /></div><div><label for="order-unit-price">سعر القطعة (EGP)</label><input id="order-unit-price" name="unit_price" type="number" min="0" step="0.01" required /></div></div>
+        <p class="order-total-preview">إجمالي الطلب: <strong id="order-total-preview">EGP 0.00</strong></p>
         <label for="order-notes">ملاحظات خاصة (اختياري)</label><textarea id="order-notes" name="notes" maxlength="1000" rows="3"></textarea>
         <p class="privacy-note">بيانات العملاء محفوظة في قاعدة بيانات متجرك الخاصة، ولا يطّلع عليها الزوار.</p>
         <p class="form-error" id="order-error" role="alert"></p>
@@ -412,7 +412,7 @@ const orderForm = document.querySelector("#order-form");
 const editorStorageKey = "zain-admin-supabase-config";
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "USD",
+  currency: "EGP",
 });
 const statusLabels = {
   pending: "بانتظار التأكيد",
@@ -1108,7 +1108,7 @@ await initialize();
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="announcement">A little love for your skin — free shipping over $50</div>
+    <div class="announcement">A little love for your skin — free shipping over EGP 50</div>
 
     <header class="site-header">
       <a class="brand-link" href="#" aria-label="ZAIN COSMETICS home">
@@ -1206,16 +1206,16 @@ await initialize();
       <ul class="cart-items"></ul>
       <p class="cart-empty">Your bag is waiting for a little something.</p>
       <div class="cart-summary">
-        <div><span>Subtotal</span><strong class="cart-subtotal">$0.00</strong></div>
-        <div><span>Shipping</span><strong class="cart-shipping">$5.00</strong></div>
+        <div><span>Subtotal</span><strong class="cart-subtotal">EGP 0.00</strong></div>
+        <div><span>Shipping</span><strong class="cart-shipping">EGP 5.00</strong></div>
         <button class="checkout-button" type="button" disabled>Continue to checkout <span aria-hidden="true">→</span></button>
         <p>Shipping is calculated at checkout.</p>
       </div>
     </aside>
     <div class="toast" role="status" aria-live="polite"></div>
     <script src="supabase-config.js?v=catalog-sections-20261008"></script>
-    <script src="script.js"></script>
-    <script type="module" src="storefront-catalog.js?v=clean-product-images-20261009"></script>
+    <script src="script.js?v=egp-currency-20261009"></script>
+    <script type="module" src="storefront-catalog.js?v=egp-currency-20261009"></script>
   </body>
 </html>
 ```
@@ -1236,8 +1236,16 @@ const cartShippingNote = document.querySelector(".cart-shipping-note");
 const cartItemCount = document.querySelector(".cart-item-count");
 const checkoutButton = document.querySelector(".checkout-button");
 const cart = new Map();
+const moneyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "EGP",
+});
 const freeShippingThreshold = 50;
 let toastTimer;
+
+function formatMoney(value) {
+  return moneyFormatter.format(Number(value) || 0);
+}
 
 function showToast(message) {
   toast.textContent = message;
@@ -1258,11 +1266,11 @@ function renderCart() {
   cartItems.replaceChildren();
   cartEmpty.hidden = items.length > 0;
   checkoutButton.disabled = items.length === 0;
-  cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
-  cartShipping.textContent = shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`;
+  cartSubtotal.textContent = formatMoney(subtotal);
+  cartShipping.textContent = shipping === 0 ? "Free" : formatMoney(shipping);
   cartShippingNote.textContent = subtotal >= freeShippingThreshold
     ? "Lovely — your order ships free!"
-    : `You're $${(freeShippingThreshold - subtotal).toFixed(2)} away from free shipping.`;
+    : `You're ${formatMoney(freeShippingThreshold - subtotal)} away from free shipping.`;
 
   items.forEach((item) => {
     const row = document.createElement("li");
@@ -1273,7 +1281,7 @@ function renderCart() {
     const name = document.createElement("strong");
     name.textContent = item.name;
     const price = document.createElement("span");
-    price.textContent = `$${item.price.toFixed(2)}`;
+    price.textContent = formatMoney(item.price);
     details.append(name, price);
 
     const controls = document.createElement("div");
@@ -1433,6 +1441,15 @@ Use **سجّلي طلبًا** in the owner dashboard when an order arrives by ph
 ```javascript
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const moneyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "EGP",
+});
+
+function formatMoney(value) {
+  return moneyFormatter.format(Number(value) || 0);
+}
+
 function showCatalogError(message) {
   const notice = document.querySelector(".catalog-feedback");
   notice.textContent = message;
@@ -1510,7 +1527,7 @@ function renderProducts(products) {
       createElement("h3", "", product.name),
       createElement("p", "", product.description || product.category),
     );
-    info.append(details, createElement("span", "", `$${Number(product.price).toFixed(2)}`));
+    info.append(details, createElement("span", "", formatMoney(product.price)));
     card.append(visual, info);
     grid.append(card);
   });

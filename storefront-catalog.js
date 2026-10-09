@@ -1,5 +1,14 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const moneyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "EGP",
+});
+
+function formatMoney(value) {
+  return moneyFormatter.format(Number(value) || 0);
+}
+
 function showCatalogError(message) {
   const notice = document.querySelector(".catalog-feedback");
   notice.textContent = message;
@@ -77,7 +86,7 @@ function renderProducts(products) {
       createElement("h3", "", product.name),
       createElement("p", "", product.description || product.category),
     );
-    info.append(details, createElement("span", "", `$${Number(product.price).toFixed(2)}`));
+    info.append(details, createElement("span", "", formatMoney(product.price)));
     card.append(visual, info);
     grid.append(card);
   });
