@@ -1105,7 +1105,7 @@ await initialize();
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=hero-word-reveal-20261009" />
+    <link rel="stylesheet" href="styles.css?v=slower-hero-word-reveal-20261009" />
   </head>
   <body>
     <div class="announcement" aria-label="A little love for your skin — free shipping over EGP 1,500">
@@ -1871,12 +1871,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
 h1, h2, h3, p { margin-top: 0; }
 h1, h2 { font-family: var(--serif); font-weight: 400; letter-spacing: -.045em; }
 h1 { margin: 0; font-size: clamp(50px, 6vw, 79px); line-height: 1.06; }
-.hero-word { display: inline-block; opacity: 0; transform: translateY(.35em); animation: hero-word-reveal .55s cubic-bezier(.2,.7,.25,1) both; }
-.hero-word-2 { animation-delay: .18s; }
-.hero-word-3 { animation-delay: .36s; }
-.hero-word-4 { animation-delay: .54s; }
-.hero-word-5 { animation-delay: .72s; }
-.hero-word-6 { animation-delay: .9s; }
+.hero-word { display: inline-block; opacity: 0; transform: translateY(.35em); animation: hero-word-reveal .7s cubic-bezier(.2,.7,.25,1) both; }
+.hero-word-2 { animation-delay: .28s; }
+.hero-word-3 { animation-delay: .56s; }
+.hero-word-4 { animation-delay: .84s; }
+.hero-word-5 { animation-delay: 1.12s; }
+.hero-word-6 { animation-delay: 1.4s; }
 @keyframes hero-word-reveal { to { opacity: 1; transform: translateY(0); } }
 h1 em, h2 em { color: #b78376; font-weight: 400; }
 .hero-description { max-width: 370px; margin: 22px 0 25px; color: var(--muted); font-size: 12px; line-height: 1.9; }
