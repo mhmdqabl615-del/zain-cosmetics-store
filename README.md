@@ -1215,7 +1215,7 @@ await initialize();
     <div class="toast" role="status" aria-live="polite"></div>
     <script src="supabase-config.js?v=catalog-sections-20261008"></script>
     <script src="script.js"></script>
-    <script type="module" src="storefront-catalog.js?v=catalog-sections-20261008"></script>
+    <script type="module" src="storefront-catalog.js?v=clean-product-images-20261009"></script>
   </body>
 </html>
 ```
@@ -1485,14 +1485,6 @@ function renderProducts(products) {
       visual.append(photo);
     }
 
-    const artwork = createElement("div", "live-product-art");
-    artwork.append(
-      createElement("span", "", "ZAIN COSMETICS"),
-      createElement("strong", "", product.name),
-    );
-    if (product.category) artwork.append(createElement("small", "", product.category));
-    visual.append(artwork);
-
     if (Number(product.stock) < 1) {
       visual.append(createElement("span", "product-tag", "Sold out"));
     } else if (product.featured) {
@@ -1639,10 +1631,6 @@ h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
 .product-image { position: relative; display: grid; height: clamp(220px, 28vw, 350px); place-items: center; overflow: hidden; }
 .product-image.product-image-live { background: linear-gradient(145deg,#eee7e0,#e5d8d0); }
 .live-product-photo { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.live-product-art { position: relative; z-index: 1; display: flex; width: 72%; min-height: 55%; align-items: center; justify-content: center; flex-direction: column; padding: 16px; background: #6f45cf; color: #fff; text-align: center; }
-.live-product-art span { margin-bottom: 13px; color: #b5e526; font-family: var(--serif); font-size: 9px; letter-spacing: .17em; }
-.live-product-art strong { font-family: var(--serif); font-size: clamp(19px,2.4vw,33px); font-weight: 400; line-height: 1.2; }
-.live-product-art small { margin-top: 10px; color: #ffffffc2; font-size: 9px; }
 .product-image-live::before, .product-image-live::after { pointer-events: none; }
 .product-grid-live .swatches { display: none; }
 .image-serum { background: #e9e0d7; }

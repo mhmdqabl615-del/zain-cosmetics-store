@@ -52,14 +52,6 @@ function renderProducts(products) {
       visual.append(photo);
     }
 
-    const artwork = createElement("div", "live-product-art");
-    artwork.append(
-      createElement("span", "", "ZAIN COSMETICS"),
-      createElement("strong", "", product.name),
-    );
-    if (product.category) artwork.append(createElement("small", "", product.category));
-    visual.append(artwork);
-
     if (Number(product.stock) < 1) {
       visual.append(createElement("span", "product-tag", "Sold out"));
     } else if (product.featured) {
