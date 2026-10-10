@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { addCartItem, loadCart, saveCart } from "./cart-storage.js";
+import "./image-zoom.js";
 
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -70,8 +71,19 @@ async function loadProduct() {
       photo.className = "live-product-photo";
       photo.src = product.image_url;
       photo.alt = product.name;
-      photo.onerror = () => photo.remove();
+      const zoomButton = document.createElement("button");
+      zoomButton.className = "product-image-zoom";
+      zoomButton.type = "button";
+      zoomButton.textContent = "⤢";
+      zoomButton.dataset.imageZoom = product.image_url;
+      zoomButton.dataset.imageAlt = product.name;
+      zoomButton.setAttribute("aria-label", `Enlarge image of ${product.name}`);
+      photo.onerror = () => {
+        photo.remove();
+        zoomButton.remove();
+      };
       visual.append(photo);
+      visual.append(zoomButton);
     }
 
     details.querySelector(".product-detail-category").textContent = product.category || "";

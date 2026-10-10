@@ -1106,7 +1106,7 @@ await initialize();
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=text-first-hero-20261009" />
+    <link rel="stylesheet" href="styles.css?v=product-image-zoom-20261010" />
   </head>
   <body>
     <div class="announcement" aria-label="A little love for your skin — free shipping over EGP 1,500">
@@ -1216,9 +1216,13 @@ await initialize();
       </div>
     </aside>
     <div class="toast" role="status" aria-live="polite"></div>
+    <dialog class="image-zoom-dialog" aria-label="Enlarged product image">
+      <button class="image-zoom-close" type="button" aria-label="Close enlarged image">×</button>
+      <img class="image-zoom-image" alt="" />
+    </dialog>
     <script src="supabase-config.js?v=catalog-sections-20261008"></script>
     <script type="module" src="script.js?v=free-shipping-1500-20261009"></script>
-    <script type="module" src="storefront-catalog.js?v=product-page-20261009"></script>
+    <script type="module" src="storefront-catalog.js?v=product-image-zoom-20261010"></script>
   </body>
 </html>
 ```
@@ -1241,7 +1245,7 @@ await initialize();
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=purple-boxes-brand-green-20261009" />
+    <link rel="stylesheet" href="styles.css?v=product-image-zoom-20261010" />
   </head>
   <body>
     <header class="site-header">
@@ -1267,8 +1271,12 @@ await initialize();
         </div>
       </article>
     </main>
+    <dialog class="image-zoom-dialog" aria-label="Enlarged product image">
+      <button class="image-zoom-close" type="button" aria-label="Close enlarged image">×</button>
+      <img class="image-zoom-image" alt="" />
+    </dialog>
     <script src="supabase-config.js?v=egp-currency-20261009"></script>
-    <script type="module" src="product-details.js?v=product-bag-20261009"></script>
+    <script type="module" src="product-details.js?v=product-image-zoom-20261010"></script>
   </body>
 </html>
 ```
@@ -1565,6 +1573,7 @@ Use **سجّلي طلبًا** in the owner dashboard when an order arrives by ph
 
 ```javascript
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import "./image-zoom.js";
 
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -1626,8 +1635,17 @@ function renderProducts(products) {
       photo.src = product.image_url;
       photo.alt = product.name;
       photo.loading = "lazy";
-      photo.onerror = () => photo.remove();
+      const zoomButton = createElement("button", "product-image-zoom", "⤢");
+      zoomButton.type = "button";
+      zoomButton.dataset.imageZoom = product.image_url;
+      zoomButton.dataset.imageAlt = product.name;
+      zoomButton.setAttribute("aria-label", `Enlarge image of ${product.name}`);
+      photo.onerror = () => {
+        photo.remove();
+        zoomButton.remove();
+      };
       imageLink.append(photo);
+      visual.append(zoomButton);
     }
     visual.append(imageLink);
 
@@ -1704,11 +1722,36 @@ if (configuration?.url && configuration?.anonKey) {
 }
 ```
 
+### `image-zoom.js`
+
+```javascript
+const dialog = document.querySelector(".image-zoom-dialog");
+const enlargedImage = dialog?.querySelector(".image-zoom-image");
+
+if (dialog && enlargedImage) {
+  document.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-image-zoom]");
+    if (!trigger) return;
+
+    event.preventDefault();
+    enlargedImage.src = trigger.dataset.imageZoom;
+    enlargedImage.alt = trigger.dataset.imageAlt || "";
+    dialog.showModal();
+  });
+
+  dialog.querySelector(".image-zoom-close").addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+}
+```
+
 ### `product-details.js`
 
 ```javascript
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { addCartItem, loadCart, saveCart } from "./cart-storage.js";
+import "./image-zoom.js";
 
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -1779,8 +1822,19 @@ async function loadProduct() {
       photo.className = "live-product-photo";
       photo.src = product.image_url;
       photo.alt = product.name;
-      photo.onerror = () => photo.remove();
+      const zoomButton = document.createElement("button");
+      zoomButton.className = "product-image-zoom";
+      zoomButton.type = "button";
+      zoomButton.textContent = "⤢";
+      zoomButton.dataset.imageZoom = product.image_url;
+      zoomButton.dataset.imageAlt = product.name;
+      zoomButton.setAttribute("aria-label", `Enlarge image of ${product.name}`);
+      photo.onerror = () => {
+        photo.remove();
+        zoomButton.remove();
+      };
       visual.append(photo);
+      visual.append(zoomButton);
     }
 
     details.querySelector(".product-detail-category").textContent = product.category || "";
@@ -1951,6 +2005,9 @@ h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
 .product-detail-back { color: var(--ink); text-decoration: none; }
 .product-detail { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.85fr); align-items: center; gap: clamp(28px,7vw,90px); }
 .product-detail[hidden] { display: none; }
+.product-image-zoom { position: absolute; z-index: 4; top: 12px; right: 12px; display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid #e9e2dc; border-radius: 50%; background: var(--paper); color: var(--brand-purple); cursor: zoom-in; font-size: 21px; line-height: 1; }
+.product-image-zoom:hover { background: var(--brand-purple); color: white; }
+.product-image-zoom:focus-visible, .image-zoom-close:focus-visible { outline: 2px solid var(--brand-forest); outline-offset: 3px; }
 .product-detail-visual { height: min(68vh,600px); min-height: 340px; }
 .product-detail-visual .live-product-photo { object-fit: contain; }
 .product-detail-info { padding: 20px 0; }
@@ -1964,6 +2021,10 @@ h2 { margin-bottom: 0; font-size: clamp(38px, 4.4vw, 55px); line-height: 1.12; }
 .product-detail-cart-status { min-height: 18px; margin: 12px 0 0; color: #58762b; font-size: 12px; }
 .product-detail-message { padding: 30px 20px; background: #f7f4f1; color: #756c65; font-size: 14px; text-align: center; }
 .product-detail-message[hidden] { display: none; }
+.image-zoom-dialog { position: relative; width: min(92vw,1100px); max-width: none; max-height: 92dvh; padding: 50px 20px 20px; overflow: auto; border: 1px solid var(--line); background: var(--paper); }
+.image-zoom-dialog::backdrop { background: rgba(32,26,24,.82); }
+.image-zoom-image { display: block; width: 100%; max-height: calc(92dvh - 72px); object-fit: contain; }
+.image-zoom-close { position: absolute; z-index: 1; top: 10px; right: 10px; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; background: var(--paper); color: var(--ink); cursor: pointer; font-size: 23px; line-height: 1; }
 .swatches { display: flex; align-items: center; gap: 5px; color: #8e837c; font-size: 8px; }
 .swatches span { margin-left: 3px; }
 .swatch { width: 11px; height: 11px; border: 1px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1px #ded5ce; }

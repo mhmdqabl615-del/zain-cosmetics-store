@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import "./image-zoom.js";
 
 const moneyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -60,8 +61,17 @@ function renderProducts(products) {
       photo.src = product.image_url;
       photo.alt = product.name;
       photo.loading = "lazy";
-      photo.onerror = () => photo.remove();
+      const zoomButton = createElement("button", "product-image-zoom", "⤢");
+      zoomButton.type = "button";
+      zoomButton.dataset.imageZoom = product.image_url;
+      zoomButton.dataset.imageAlt = product.name;
+      zoomButton.setAttribute("aria-label", `Enlarge image of ${product.name}`);
+      photo.onerror = () => {
+        photo.remove();
+        zoomButton.remove();
+      };
       imageLink.append(photo);
+      visual.append(zoomButton);
     }
     visual.append(imageLink);
 
